@@ -4,6 +4,7 @@ import re
 
 dirname = os.path.dirname(__file__)
 
+# loading helper
 def load_folder(folder):
     data = []
     folder_name = os.path.join(dirname, folder)
@@ -13,30 +14,32 @@ def load_folder(folder):
             data.append(reader.read_csv(filepath))
     return data
 
-
+# load data sets
 def DATASET_5fbg_1():
-    return load_folder("Measured/5fbg/strain FBG1")
+    return load_folder("Measured/5fbg/strain FBG1/")
+
+def DATASET_5fbg_1_1():
+    return load_folder("Measured/5fbg/strain FBG1/only FBG1")
 
 def DATASET_5fbg_2():
     return load_folder("Measured/5fbg/strain FBG1 _ FBG2")
 
+def DATASET_5fbg_2_1():
+    return load_folder("Measured/5fbg/strain FBG1 _ FBG2/only FBG1(2 units)")
 
+def DATASET_5fbg_2_2():
+    return load_folder("Measured/5fbg/strain FBG1 _ FBG2/only FBG2")
 
+def DATASET_5fbg_3():
+    return load_folder("Measured/5fbg/strain FBG1 _ FBG2 _ FBG3")
 
+def DATASET_5fbg_3_1():
+    return load_folder("Measured/5fbg/strain FBG1 _ FBG2 _ FBG3/only FBG1(3 units)")
 
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
+def DATASET_5fbg_3_2():
+    return load_folder("Measured/5fbg/strain FBG1 _ FBG2 _ FBG3/only FBG2(2 units)")
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    import numpy as np
-    data = DATASET_5fbg_1()
-
-    for i,d in enumerate(data):
-        ax.plot(*d, zs=i, zdir='y')
-
-    plt.show()
+def DATASET_5fbg_3_3():
+    return load_folder("Measured/5fbg/strain FBG1 _ FBG2 _ FBG3/only FBG3")
 
     
