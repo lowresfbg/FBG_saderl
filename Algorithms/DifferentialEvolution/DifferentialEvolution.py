@@ -1,5 +1,17 @@
 import numpy as np
 
+from numba import jit
+
+
+@jit
+def JIT_Mutate(X, NP, CR, F, ai, bi, ci):
+    
+
+    V = X[ai] + F*(X[bi]-X[ci])
+
+    X = X + ((V-X)*(np.random.rand(*X.shape) < CR))
+    return X
+
 
 def Mutate(X, CR=0.5, F=1):
     NP = len(X)
@@ -22,10 +34,4 @@ def Mutate(X, CR=0.5, F=1):
     remain = remain[i2 != b].reshape(NP, -1)
     ci = remain[i3 == c]
 
-    V = X[ai] + F*(X[bi]-X[ci])
-
-    X = X + ((V-X)*(np.random.rand(*X.shape) < CR))
-
-    return X
-
-
+    return JIT_Mutate(X, NP, CR, F, ai, bi, ci)
