@@ -9,7 +9,7 @@ from Dataset.Simulation.GaussCurve import FBG_spectra
 
 from Dataset.Simulation.GaussCurve import GaussCurve
 
-from Dataset.loader import DATASET_5fbg_2 as Dataset
+from Dataset.loader import DATASET_5fbg_1 as Dataset
 
 print('loading dataset')
 dataset = Dataset()
@@ -31,7 +31,7 @@ de_newdiff.minx = 1545
 de_newdiff.maxx = 1549
 de_newdiff.I = I
 de_newdiff.W = W
-de_newdiff.NP = 20
+de_newdiff.NP = 50
 
 
 def plot(data, X):
@@ -41,13 +41,25 @@ def plot(data, X):
     plt.plot(data[0], simulation.T, c='gray')
     plt.plot(*data, c='red')
 
-    A = simulation[0]
-    B = data[1]
-    plt.twinx()
-    plt.plot(data[0], (A-B)**2, c='green')
-    plt.twinx()
-    plt.plot(data[0], ((A-B)**2)/(A+B), c='orange')
+    # A = simulation[0]
+    # B = data[1]
+    # plt.twinx()
+    # plt.plot(data[0], (A-B)**2, c='green')
+    # plt.twinx()
+    # plt.plot(data[0], ((A-B)**2)/(A+B), c='orange')
 
+def plotPause(info):
+
+    i, data, X, V, dx, dv = info
+
+    if i%10==0:
+        plt.clf()
+        plot(data, X)
+        plt.pause(0.02)
+
+
+# de_newdiff.run(dataset[26], iterations=400, forEach=plotPause)
+# plt.show()
 
 class Plotter():
     def __init__(self):
@@ -89,7 +101,7 @@ X_log = []
 for idata, data in enumerate(dataset):
     # data = dataset[10]
     print(idata, '/', len(dataset))
-    X = de.run(data, iterations=200)
+    X = de_newdiff.run(data, iterations=500)
 
     X_log.append(X[np.argmin(de.Evaluate(data, X))])
     plt.clf()

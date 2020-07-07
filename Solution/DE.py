@@ -21,7 +21,9 @@ class DE():
 
         self.NP = 10
         self.CR = 0.5
-        self.F = 1.5
+        self.F = 1
+
+        self.iter = 0
 
     def Evaluate(self, data, X):
         simulation = FBG_spectra(data[0], X, self.I, self.W)
@@ -32,8 +34,13 @@ class DE():
 
     def run(self, data, iterations=300, forEach=lambda x: x):
         X = np.random.rand(self.NP, 5)*(self.maxx-self.minx)+self.minx
+        full_data = data
 
         for i in range(iterations):
+
+            step = max(1, int((1-i/iterations)*100))
+            data = full_data[:,::step]
+            self.iter = i
 
             V = de_alg.Mutate(X, self.CR, self.F)
 
