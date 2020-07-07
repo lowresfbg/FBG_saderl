@@ -17,20 +17,20 @@ maxx = 1549
 def FBG(x_coord, X):
     x_coord = np.tile(x_coord, X.shape+(1,))
     X = np.expand_dims(X, axis=len(X.shape))
-    I = np.array([5.75, 2.95, 2.2, 1, 0.5])[:, np.newaxis]*0.001
+    I = np.array([5.72, 2.95, 2.2, 1, 0.5])[:, np.newaxis]*0.001
     return np.sum(GaussCurve(x_coord, I, X, 0.05), axis=1)
 
 
 def difference(data, X):
     simulation = FBG(data[0], X)
-    return np.mean(((simulation-data[1])/(simulation+data[1]))**2, axis=1)
+    return np.mean(((simulation-data[1])/(simulation+data[1]+0.006))**2, axis=1)
 
 
 def run(data):
     X = np.random.rand(15,5)*(maxx-minx)+minx
 
 
-    for i in range(200):
+    for i in range(300):
         
         V = DE.Mutate(X, 0.5, 1)
 
@@ -52,7 +52,7 @@ def run(data):
     plt.show()
     return X
 
-run(dataset[30])
+run(dataset[10])
 
 # X_log = []
 
@@ -68,3 +68,4 @@ run(dataset[30])
 #     plt.pause(0.01)
 
 
+# plt.show()
