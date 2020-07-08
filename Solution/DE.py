@@ -26,7 +26,9 @@ class DE():
         self.iter = 0
 
     def Evaluate(self, data, X):
-        simulation = FBG_spectra(data[0], X, self.I, self.W)
+        I = np.repeat([self.I], X.shape[0], axis=0)
+        I[:,0]+=(X[:,0] - 1546.52)*-0.35
+        simulation = FBG_spectra(data[0], X, I, self.W)
         return self.spectra_diff(simulation, data[1])
 
     def spectra_diff(self, A, B):
@@ -38,7 +40,7 @@ class DE():
 
         for i in range(iterations):
 
-            step = max(1, int((1-i/iterations)*100))
+            step = max(1, int((1-i/iterations)*50))
             data = full_data[:,::step]
             self.iter = i
 
