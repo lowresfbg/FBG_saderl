@@ -41,6 +41,19 @@ def loop(i, full_data, iterations, X, CR, F, max_xn, min_xn, I, W):
     return X, V, dx, dv
 
 
+@tf.function
+def computeRange(data, I):
+    xs = tf.repeat([data[0][::10]], tf.shape(I)[0], axis=0)
+    ys = tf.repeat([data[1][::10]], tf.shape(I)[0], axis=0)
+    Is = tf.expand_dims(I, axis=1)*0.001*0.8
+
+    mask = tf.cast(ys > Is, tf.dtypes.float32)
+
+    max_xn = tf.reduce_max(xs*mask, axis=1)
+    min_xn = tf.reduce_min(xs+(1-mask)*1e20, axis=1)
+    # print(xs, ys,max_xn, min_xn)
+
+    return max_xn+0.1, min_xn-0.1
 
 
 class DE(tf.keras.Model):
@@ -59,20 +72,23 @@ class DE(tf.keras.Model):
         self.X = []
         self.V = []
 
-    def loop_py(self, i, data, iterations, forEach):
+    def loop_py(self, i, data, iterations, max_xn, min_xn, forEach):
         self.iter = i
 
         self.X, V, dx, dv = loop(tf.constant(i), data, iterations, self.X,
                                  self.CR,  self.F,
-                                 self.maxx, self.minx,
+                                 max_xn, min_xn,
                                  self.I,  tf.constant(self.W))
         forEach([i, data, self.X, V, dx, dv])
         return (i+1,)
 
     def run(self, data, iterations=300, forEach=lambda x: x):
+        max_xn, min_xn = computeRange(data, self.I)
 
 
         self.X = tf.random.uniform([self.NP, 5]) 
+        max_xn = tf.repeat([max_xn], tf.shape(self.X)[0], axis=0)
+        min_xn = tf.repeat([min_xn], tf.shape(self.X)[0], axis=0)
 
         self.X = self.X*(self.maxx-self.minx)+self.minx
 
@@ -81,7 +97,7 @@ class DE(tf.keras.Model):
         iterations = tf.constant(iterations)
 
         tf.while_loop(lambda _: self.iter < iterations,
-                      lambda i: self.loop_py(i, data, iterations, forEach), (i,))
+                      lambda i: self.loop_py(i, data, iterations, max_xn, min_xn, forEach), (i,))
 
         return self.X
 

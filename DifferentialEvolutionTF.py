@@ -3,12 +3,9 @@ import matplotlib.pyplot as plt
 
 
 from Solution.DE_TF import DE as DETF
-
-from Solution.DE_TF import Evaluate, computeRange
+from Solution.DE_TF import Evaluate
 
 from Dataset.Simulation.GaussCurve_TF import FBG_spectra, GaussCurve
-
-
 from Dataset.loader import DATASET_5fbg_1 as Dataset
 
 import tensorflow as tf
@@ -19,6 +16,7 @@ print('dataset load done')
 
 I = [5.685, 2.919, 2.25, 0.9342, 0.4047]
 W = tf.constant([0.25, 0.25, 0.25, 0.25, 0.25])
+ITERATION = 500
 
 detf = DETF()
 
@@ -29,6 +27,8 @@ def init(de):
     de.I = I
     de.W = W
     de.NP = 50
+    de.CR = 0.5
+    de.F = 1.1
 
 
 init(detf)
@@ -59,7 +59,7 @@ def plotPause(info):
         plt.pause(0.02)
 
 
-# detf.run(dataset[2], iterations=400, forEach=plotPause)
+# detf.run(dataset[2], iterations=ITERATION, forEach=plotPause)
 # plt.show()
 
 
@@ -73,15 +73,15 @@ class Plotter():
 
 
 X_log = []
-max_log = []
-min_log = []
+# max_log = []
+# min_log = []
 
 
 def evaluateData(data):
      # data = dataset[10]
     print('run ------------------')
-    print(data)
-    X = detf(data, iterations=200)
+    # print(data)
+    X = detf(data, iterations=ITERATION)
 
     X_log.append(X[tf.argmin(Evaluate(data, X, I, W))])
     plt.clf()
@@ -91,10 +91,10 @@ def evaluateData(data):
     plt.axhline(1547.65375, linestyle=":")
     plt.axhline(1548.015, linestyle=":")
 
-    max_xn, min_xn = computeRange(data, I)
+    # max_xn, min_xn = computeRange(data, I)
 
-    max_log.append(max_xn)
-    min_log.append(min_xn)
+    # max_log.append(max_xn)
+    # min_log.append(min_xn)
 
     plt.plot(X_log)
 
@@ -104,9 +104,9 @@ def evaluateData(data):
 
 Xs = tf.map_fn(evaluateData, dataset)
 
-for i in range(len(I))[::-1]:
-    plt.fill_between(range(len(X_log)), np.array(
-        min_log)[:, i], np.array(max_log)[:, i], alpha=0.3)
+# for i in range(len(I))[::-1]:
+#     plt.fill_between(range(len(X_log)), np.array(
+#         min_log)[:, i], np.array(max_log)[:, i], alpha=0.3)
 
 print(Xs)
 plt.show()
