@@ -15,8 +15,8 @@ dataset = tf.constant(Dataset(), dtype=tf.dtypes.float32)#[:,:,948-76:1269-76]
 print('dataset load done')
 
 I = [5.685, 2.919, 2.25, 0.9342, 0.4047]
-W = tf.constant([0.25, 0.25, 0.25, 0.25, 0.25])
-ITERATION = 5
+W = tf.constant([0.1925, 0.1925, 0.1975, 0.1975, 0.2])
+ITERATION = 500
 
 detf = DETF()
 
