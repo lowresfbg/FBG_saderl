@@ -14,12 +14,13 @@ def Evaluate(data, X, I, W):
                    * -0.35, I[:, 1:]], axis=1)
     W = tf.repeat([W], X.shape[0], axis=0)
     simulation = FBG_spectra(data[0], X, I, W)
+
     return spectra_diff(simulation, data[1])
 
 
 @tf.function
 def spectra_diff(A, B):
-    return tf.reduce_sum((A-B)**2/(A+B), axis=1)
+    return tf.reduce_mean((A-B)**2/(A+B), axis=1)
 
 
 @tf.function
