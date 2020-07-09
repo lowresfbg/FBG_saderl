@@ -4,7 +4,7 @@ from numba import jit
 
 @jit
 def GaussCurve(x, I, C, W):
-    return I*np.exp(-np.sqrt(2)*4*((x-C)/W)**2)
+    return I*np.exp(-np.log(2)*4*((x-C)/W)**2)
 
 
 @jit
