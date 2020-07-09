@@ -69,7 +69,7 @@ class DE(tf.keras.Model):
         forEach([i, data, self.X, V, dx, dv])
         return (i+1,)
 
-    def run(self, data, iterations=300, forEach=lambda x: x):
+    def run(self, data, iterations, forEach=lambda x: x):
 
 
         self.X = tf.random.uniform([self.NP, len(self.I)]) 

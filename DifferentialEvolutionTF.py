@@ -16,7 +16,7 @@ print('dataset load done')
 
 I = [5.685, 2.919, 2.25, 0.9342, 0.4047]
 W = tf.constant([0.25, 0.25, 0.25, 0.25, 0.25])
-ITERATION = 500
+ITERATION = 5
 
 detf = DETF()
 
