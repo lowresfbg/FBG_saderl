@@ -20,7 +20,7 @@ print('dataset load done')
 
 I = [5.685, 2.919, 2.25, 0.9342, 0.4047]
 W = tf.constant([0.1925, 0.1925, 0.1975, 0.1975, 0.2])*1.1
-ITERATION = 400
+ITERATION = 300
 
 de = DESPCM()
 SpectraModel, SCM = GetModels()
@@ -31,7 +31,7 @@ def init(de):
     de.maxx = 1549.0
     de.I = I
     de.W = W
-    de.NP = 50
+    de.NP = 100
     de.CR = 0.5
     de.F = 1
 
@@ -122,11 +122,10 @@ for i in range(10):
     print(Xs)
     plt.show()
 
-    for i in range(3):
+    for i in range(20):
         Train(SCM, dataset, tf.reduce_mean(Xs, axis=1), I, W)
+    de.compensate = 1
 
     X = de.run(data, iterations=ITERATION, forEach=plotPause)
     X = tf.reduce_mean(X, axis=0)
     plt.show()
-
-    de.compensate = 1

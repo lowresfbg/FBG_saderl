@@ -37,8 +37,8 @@ def GetModel():
     C_flat = tf.reshape(tf.broadcast_to(C, full_shape), (-1, 1))
     W_flat = tf.reshape(tf.broadcast_to(W, full_shape), (-1, 1))
 
-    CM_input = tf.concat([(X_flat-C_flat)*100.0, I_flat,
-                          (C_flat-1545.0)*20, W_flat/0.2], axis=1)
+    CM_input = tf.concat([(X_flat-C_flat)*100.0, I_flat*0,
+                          (C_flat-1545.0)*20 *0, W_flat/0.2*0], axis=1)
 
     compensates = CM(CM_input) 
 

@@ -38,9 +38,9 @@ def Spectra(x_coord, X, I, W):
     return spectra, scm_spectra
 
 
-def Evaluate(data, X, I, W, compensate = 0):
+def Evaluate(data, X, I, W, compensate):
     scm_spectra = Spectra(data[0], X, I, W)
-    simulation = scm_spectra[0]
+    simulation = scm_spectra[compensate]
     return spectra_diff(simulation, data[1])
 
 
@@ -93,7 +93,7 @@ class DESPCM(tf.keras.Model):
                                  self.CR,  self.F,
                                  self.maxx, self.minx,
                                  self.I,  tf.constant(self.W),
-                                 tf.constant(self.compensate))
+                                 self.compensate)
         forEach([i, data, self.X, V, dx, dv])
         return (i+1,)
 
