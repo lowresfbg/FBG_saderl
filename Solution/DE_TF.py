@@ -72,7 +72,7 @@ class DE(tf.keras.Model):
     def run(self, data, iterations=300, forEach=lambda x: x):
 
 
-        self.X = tf.random.uniform([self.NP, 5]) 
+        self.X = tf.random.uniform([self.NP, len(self.I)]) 
 
         self.X = self.X*(self.maxx-self.minx)+self.minx
 

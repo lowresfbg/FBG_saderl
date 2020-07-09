@@ -11,7 +11,7 @@ from Dataset.loader import DATASET_5fbg_1 as Dataset
 import tensorflow as tf
 
 print('loading dataset')
-dataset = tf.constant(Dataset(), dtype=tf.dtypes.float32)
+dataset = tf.constant(Dataset(), dtype=tf.dtypes.float32)#[:,:,948-76:1269-76]
 print('dataset load done')
 
 I = [5.685, 2.919, 2.25, 0.9342, 0.4047]
@@ -59,8 +59,8 @@ def plotPause(info):
         plt.pause(0.02)
 
 
-# detf.run(dataset[2], iterations=ITERATION, forEach=plotPause)
-# plt.show()
+detf.run(dataset[12], iterations=ITERATION, forEach=plotPause)
+plt.show()
 
 
 class Plotter():
