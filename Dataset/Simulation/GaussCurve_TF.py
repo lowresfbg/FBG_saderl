@@ -10,6 +10,7 @@ def FBG_spectra(x_coord, X, I, W):
     x_coord = tf.cast(tf.tile([[x_coord]], X.shape+(1,)),tf.dtypes.float32)
     X = tf.expand_dims(X, axis=len(X.shape))
     I = tf.expand_dims(I, axis=len(I.shape))
+    W = tf.expand_dims(W, axis=len(W.shape))
     I*=0.001
 
     return tf.reduce_sum(GaussCurve(x_coord, I, X, W), axis=1)

@@ -12,6 +12,7 @@ def Evaluate(data, X, I, W):
     I = tf.repeat([I], X.shape[0], axis=0)
     I = tf.concat([I[:, :1] + (X[:, :1] - 1546.52)
                    * -0.35, I[:, 1:]], axis=1)
+    W = tf.repeat([W], X.shape[0], axis=0)
     simulation = FBG_spectra(data[0], X, I, W)
     return spectra_diff(simulation, data[1])
 
@@ -22,7 +23,7 @@ def spectra_diff(A, B):
 
 
 @tf.function
-def loop(i, full_data, iterations, X, CR, F, minx, maxx, I, W):
+def loop(i, full_data, iterations, X, CR, F, max_xn, min_xn, I, W):
     # print(i)
     step = tf.maximum(1, tf.cast((1-i/iterations)*100, tf.dtypes.int32))
     data = full_data[:, ::step]
@@ -30,8 +31,7 @@ def loop(i, full_data, iterations, X, CR, F, minx, maxx, I, W):
 
     V = de_alg.Mutate(X, CR, F)
 
-    V = tf.clip_by_value(V, minx, maxx)
-
+    V = tf.clip_by_value(V, min_xn, max_xn)
     dv = Evaluate(data, V, I,  W)
     dx = Evaluate(data, X,  I, W)
 
@@ -41,13 +41,28 @@ def loop(i, full_data, iterations, X, CR, F, minx, maxx, I, W):
     return X, V, dx, dv
 
 
+@tf.function
+def computeRange(data, I):
+    xs = tf.repeat([data[0][::10]], tf.shape(I)[0], axis=0)
+    ys = tf.repeat([data[1][::10]], tf.shape(I)[0], axis=0)
+    Is = tf.expand_dims(I, axis=1)*0.001*0.8
+
+    mask = tf.cast(ys > Is, tf.dtypes.float32)
+
+    max_xn = tf.reduce_max(xs*mask, axis=1)
+    min_xn = tf.reduce_min(xs+(1-mask)*1e20, axis=1)
+    # print(xs, ys,max_xn, min_xn)
+
+    return max_xn+0.1, min_xn-0.1
+
+
 class DE(tf.keras.Model):
     def __init__(self):
         super(DE, self).__init__()
         self.minx = 1545
         self.maxx = 1549
         self.I = []
-        self.W = 0.04
+        self.W = []
 
         self.NP = 10
         self.CR = 0.5
@@ -57,25 +72,32 @@ class DE(tf.keras.Model):
         self.X = []
         self.V = []
 
-    def loop_py(self, i, data, iterations, forEach):
+    def loop_py(self, i, data, iterations, max_xn, min_xn, forEach):
         self.iter = i
+
         self.X, V, dx, dv = loop(tf.constant(i), data, iterations, self.X,
                                  self.CR,  self.F,
-                                 self.minx, self.maxx,
-                                 self.I,  self.W)
+                                 max_xn, min_xn,
+                                 self.I,  tf.constant(self.W))
         forEach([i, data, self.X, V, dx, dv])
         return (i+1,)
 
     def run(self, data, iterations=300, forEach=lambda x: x):
-        self.X = tf.random.uniform([self.NP, 5]) * \
-            (self.maxx-self.minx)+self.minx
+        max_xn, min_xn = computeRange(data, self.I)
+
+
+        self.X = tf.random.uniform([self.NP, 5]) 
+        max_xn = tf.repeat([max_xn], tf.shape(self.X)[0], axis=0)
+        min_xn = tf.repeat([min_xn], tf.shape(self.X)[0], axis=0)
+
+        self.X = self.X*(self.maxx-self.minx)+self.minx
+
         i = 0
         self.iter = 0
-
         iterations = tf.constant(iterations)
 
         tf.while_loop(lambda _: self.iter < iterations,
-                      lambda i: self.loop_py(i, data, iterations, forEach), (i,))
+                      lambda i: self.loop_py(i, data, iterations, max_xn, min_xn, forEach), (i,))
 
         return self.X
 
