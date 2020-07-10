@@ -14,8 +14,8 @@ def GetModels():
 def SCM_input(x_coord, X, I, W):
     # intensity compensation
     I = tf.repeat([I], X.shape[0], axis=0)
-    I = tf.concat([I[:, :1] + (X[:, :1] - 1546.52)
-                   * -0.35, I[:, 1:]], axis=1)
+    # I = tf.concat([I[:, :1] + (X[:, :1] - 1546.52)
+    #                * -0.35, I[:, 1:]], axis=1)
     W = tf.repeat([W], X.shape[0], axis=0)
 
     I = tf.expand_dims(I, axis=2)
@@ -68,6 +68,22 @@ def loop(i, full_data, iterations, X, CR, F, max_xn, min_xn, I, W, compensate):
     return X, V, dx, dv
 
 
+@tf.function
+def computeRange(data, I):
+    xs = tf.repeat([data[0][::10]], tf.shape(I)[0], axis=0)
+    ys = tf.repeat([data[1][::10]], tf.shape(I)[0], axis=0)
+    Is = tf.expand_dims(I, axis=1)*0.001*0.5
+
+    mask = tf.cast(ys > Is, tf.dtypes.float32)
+
+    max_xn = tf.reduce_max(xs*mask, axis=1)
+    min_xn = tf.reduce_min(xs+(1-mask)*1e20, axis=1)
+    # print(xs, ys,max_xn, min_xn)
+
+    return max_xn+0.1, min_xn-0.1
+
+
+
 class DESPCM(tf.keras.Model):
     def __init__(self):
         super(DESPCM, self).__init__()
@@ -86,29 +102,35 @@ class DESPCM(tf.keras.Model):
 
         self.compensate = 0
 
-    def loop_py(self, i, data, iterations, forEach):
+    def loop_py(self, i, data, iterations, max_xn, min_xn, forEach):
         self.iter = i
 
         self.X, V, dx, dv = loop(tf.constant(i), data, iterations, self.X,
                                  self.CR,  self.F,
-                                 self.maxx, self.minx,
+                                 max_xn, min_xn,
                                  self.I,  tf.constant(self.W),
                                  self.compensate)
         forEach([i, data, self.X, V, dx, dv])
         return (i+1,)
 
     def run(self, data, iterations, forEach=lambda x: x):
+        max_xn, min_xn = computeRange(data, self.I)
 
-        self.X = tf.random.uniform([self.NP, len(self.I)])
 
-        self.X = self.X*(self.maxx-self.minx)+self.minx
+        self.X = tf.random.uniform([self.NP, len(self.I)]) 
+        max_xn = tf.repeat([max_xn], tf.shape(self.X)[0], axis=0)
+        min_xn = tf.repeat([min_xn], tf.shape(self.X)[0], axis=0)
+
+        self.X = self.X*(max_xn-min_xn)+min_xn
+
+        # self.X = self.X*(self.maxx-self.minx)+self.minx
 
         i = 0
         self.iter = 0
         iterations = tf.constant(iterations)
 
         tf.while_loop(lambda _: self.iter < iterations,
-                      lambda i: self.loop_py(i, data, iterations, forEach), (i,))
+                      lambda i: self.loop_py(i, data, iterations, max_xn, min_xn, forEach), (i,))
 
         return self.X
 

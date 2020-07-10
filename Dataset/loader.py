@@ -43,6 +43,9 @@ def DATASET_5fbg_3_3():
     return load_folder("Measured/5fbg/strain FBG1 _ FBG2 _ FBG3/only FBG3")
 
 
+def DATASET_3fbg_1():
+    return load_folder("Measured/3fbg/strain FBG1")
+
 
 def DATASET_1fbg_differentResolution():
     return load_folder("Measured/1fbg/DifferentResolution")

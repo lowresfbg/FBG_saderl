@@ -25,11 +25,11 @@ def newloss(y1, y2):
 
 
 def Compile(SCM):
-    optimizer = tf.optimizers.Adam(lr=1e-2)
+    optimizer = tf.optimizers.Adam(lr=2e2)
     SCM.compile(optimizer=optimizer, loss="mse")
 
 
 def Train(SCM, dataset, X, I, W):
     input_fbg = SCM_input_training(X, I, W)
     input_x = dataset[:, 0]
-    SCM.fit((input_x, input_fbg), dataset[:, 1], epochs=50, batch_size=500)
+    SCM.fit((input_x, input_fbg), dataset[:, 1], epochs=200, batch_size=1000)
