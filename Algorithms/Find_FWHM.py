@@ -30,4 +30,4 @@ def findFWHM(data, up,down):
     FWHM = FWHP2-FWHP1
     posi = X[int((posi1+posi2)/2)]              #找半波高&位置
     Inte = Y[int((posi1+posi2)/2)]
-    
+    return FWHM,posi,Inte
