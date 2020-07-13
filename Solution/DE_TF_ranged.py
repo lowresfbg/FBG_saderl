@@ -80,7 +80,9 @@ class DE(tf.keras.Model):
                                  self.CR,  self.F,
                                  max_xn, min_xn,
                                  self.I,  tf.constant(self.W))
+        
         forEach([i, data, self.X, V, dx, dv])
+
         return (i+1,)
 
     def run(self, data, iterations=300, forEach=lambda x: x):
@@ -97,7 +99,7 @@ class DE(tf.keras.Model):
         self.iter = 0
         iterations = tf.constant(iterations)
 
-        tf.while_loop(lambda _: self.iter < iterations,
+        tf.while_loop(lambda _: i>=0 and i < iterations,
                       lambda i: self.loop_py(i, data, iterations, max_xn, min_xn, forEach), (i,))
 
         return self.X
