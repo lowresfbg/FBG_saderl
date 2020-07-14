@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
+
 @tf.function
 def Mutate(X, CR=0.5, F=1):
     NP = X.shape[0]
@@ -26,10 +27,15 @@ def Mutate(X, CR=0.5, F=1):
     # print(ai)
     # print(bi)
     # print(ci)
+    I = tf.repeat([tf.range(X.shape[1])], NP, axis=0)
+
+    R = tf.repeat(tf.expand_dims(tf.random.uniform(
+        [NP], 0, X.shape[1], tf.dtypes.int32), axis=1), X.shape[1], axis=1)
 
     V = tf.gather(X, ai) + F*(tf.gather(X, bi)-tf.gather(X, ci))
 
-    X = X + (V-X)*tf.cast(tf.random.uniform(X.shape) < CR, tf.dtypes.float32)
+    X = X + (V-X)*tf.cast(tf.math.logical_or(tf.random.uniform(X.shape)
+                                             < CR, R == I), tf.dtypes.float32)
     return X
 
 
