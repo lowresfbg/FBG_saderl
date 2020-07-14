@@ -31,9 +31,9 @@ def init(de):
     de.maxx = 1549.0
     de.I = I
     de.W = W
-    de.NP = 20
-    de.CR = 0.5
-    de.F = 1.1
+    de.NP = 30
+    de.CR = 0.7
+    de.F = 1
     de.EarlyStop_threshold = 5e-3
     de.spectra_diff = spectra_diff_contrast
 
