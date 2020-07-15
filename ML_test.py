@@ -37,7 +37,7 @@ plt.plot(spectrums2[0])
 plt.show()
 
 e_model.summary()
-#e_model.load_weights('./SavedModel/SignalErrorModel.hdf5')
+e_model.load_weights('./SavedModel/SignalErrorModel.hdf5')
 
 e_model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-2), loss="mse")
 
