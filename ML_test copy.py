@@ -24,8 +24,8 @@ x_coord = tf.linspace(0.0, 1.0, 1000)
 # W2 = tf.random.uniform([samples, fbgs], 0.01, 0.2)
 # spectrums2 = normalize(FBG_spectra(x_coord, X2, I1, W2))
 
-goal_X = tf.constant([0.3,0.7,0.4], dtype= tf.dtypes.float32)
-wrong_X = tf.constant([0.3,0.4,0.7], dtype= tf.dtypes.float32)
+goal_X = tf.constant([0.4,0.7,0.45], dtype= tf.dtypes.float32)
+wrong_X = tf.constant([0.7,0.4,0.45], dtype= tf.dtypes.float32)
 
 X1 = tf.repeat([goal_X], samples, axis=0)
 I1 = tf.repeat([[1,0.5,0.25]], samples, axis=0)
@@ -65,8 +65,11 @@ e_model.load_weights('./SavedModel/SignalErrorModel.hdf5')
 
 pred_Y = e_model(train_X)[:,0]
 print(pred_Y.shape, train_Y.shape)
-plt.plot(train_Y, "o")
-plt.plot(pred_Y, "-o")
+plt.plot(train_Y, "o", label="Ideal error surface")
+plt.plot(pred_Y, "-o", label="ML predicted error")
+plt.legend()
+
 plt.twinx()
-plt.plot(Spectra_diff, c="red")
+plt.plot(Spectra_diff, c="red", label="Spectra difference")
+plt.legend()
 plt.show()
