@@ -18,7 +18,7 @@ x_coord = tf.linspace(0.0, 1.0, 1000)
 
 X1 = tf.random.uniform([samples, fbgs])
 I1 = tf.random.uniform([samples, fbgs], 0.1, 1)
-W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.01, 0.1)
+W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.05, 0.15)
 spectrums1 = normalize(FBG_spectra(x_coord, X1, I1, W1))
 
 X2 = tf.random.uniform([samples, fbgs])
@@ -37,9 +37,9 @@ plt.plot(spectrums2[0])
 plt.show()
 
 e_model.summary()
-e_model.load_weights('./SavedModel/SignalErrorModel.hdf5')
+#e_model.load_weights('./SavedModel/SignalErrorModel.hdf5')
 
-e_model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
+e_model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-2), loss="mse")
 
 for i in range(10):
     print("training cycle", i)
