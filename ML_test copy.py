@@ -25,7 +25,7 @@ x_coord = tf.linspace(0.0, 1.0, 1000)
 # spectrums2 = normalize(FBG_spectra(x_coord, X2, I1, W2))
 
 goal_X = tf.constant([0.3,0.7,0.4], dtype= tf.dtypes.float32)
-wrong_X = tf.constant([0.4,0.7,0.3], dtype= tf.dtypes.float32)
+wrong_X = tf.constant([0.3,0.4,0.7], dtype= tf.dtypes.float32)
 
 X1 = tf.repeat([goal_X], samples, axis=0)
 I1 = tf.repeat([[1,0.5,0.25]], samples, axis=0)
@@ -33,7 +33,10 @@ W1 = tf.ones([samples, fbgs])*0.1
 spectrums1 = normalize(FBG_spectra(x_coord, X1, I1, W1))
 
 X2 = tf.expand_dims(tf.linspace(-2.0,4.0,samples),axis=1)*(wrong_X-goal_X)+goal_X
-spectrums2 = normalize(FBG_spectra(x_coord, X2, I1, W1)+
+I2 = I1 + (tf.random.uniform([samples, fbgs])-0.5)*0.01
+W2 = W1 + (tf.random.uniform([samples, fbgs])-0.5)*0.005
+
+spectrums2 = normalize(FBG_spectra(x_coord, X2, I2, W2)+
                        tf.random.uniform([samples, 1000])*1e-5)
 
 
