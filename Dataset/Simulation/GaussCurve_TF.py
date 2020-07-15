@@ -17,3 +17,7 @@ def FBG_spectra(x_coord, X, I, W):
 
 def GaussCurve_Graph(x, I, C, W):
     return I*tf.exp(-tf.sqrt(2.0)*4*((x-C)/W)**2)
+
+# def FBG_spectra_each(x_coord, X, I, W):
+#     x_coord = tf.cast(tf.tile([[x_coord]], X.shape+(1,)),tf.dtypes.float32)
+#     return tf.reduce_sum(GaussCurve(x_coord, I, X, W), axis=1)

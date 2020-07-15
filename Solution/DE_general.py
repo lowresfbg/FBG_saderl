@@ -18,6 +18,11 @@ def spectra_diff_contrast(A, B):
 
 
 @tf.function
+def spectra_diff_absolute(A, B):
+    return tf.reduce_sum(tf.abs(A-B), axis=1)
+
+
+@tf.function
 def Evaluate(data, X, I, W, spectra_diff=spectra_diff):
     I = tf.repeat([I], X.shape[0], axis=0)
     # I = tf.concat([I[:, :1] + (X[:, :1] - 1546.52)
@@ -67,7 +72,7 @@ class DE(tf.keras.Model):
         super(DE, self).__init__()
 
         # basic values
-        self.minx = 1545
+        self.minx = 1542
         self.maxx = 1549
 
         # fbg setting
