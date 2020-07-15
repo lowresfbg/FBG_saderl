@@ -17,12 +17,12 @@ def normalize(spectra):
 x_coord = tf.linspace(0.0, 1.0, 1000)
 
 X1 = tf.random.uniform([samples, fbgs])
-I1 = tf.random.uniform([samples, fbgs], 0.1, 1)
+I1 = (tf.random.uniform([samples, fbgs])-0.5)*0.1+tf.repeat([[1,0.5,0.25]], samples, axis=0)
 W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.05, 0.15)
 spectrums1 = normalize(FBG_spectra(x_coord, X1, I1, W1))
 
 X2 = tf.random.uniform([samples, fbgs])
-
+I2 = I1 + (tf.random.uniform([samples, fbgs])-0.5)*0.01
 W2 = W1 + (tf.random.uniform([samples, fbgs])-0.5)*0.005
 spectrums2 = normalize(FBG_spectra(x_coord, X2, I1, W2) +
                        (tf.random.uniform([samples, 1000])-0.5)*1e-5)
