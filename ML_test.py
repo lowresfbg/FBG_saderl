@@ -4,12 +4,12 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 e_model, f_model = SignalError.ErrorModel()
 
-samples = 1000
+samples = 10000
 fbgs = 5
 
 def normalize(spectra):
-    maximum = tf.reduce_max(spectra, axis=1)
-    minimum = tf.reduce_max(spectra, axis=1)
+    maximum = tf.expand_dims(tf.reduce_max(spectra, axis=1), axis=1)
+    minimum = tf.expand_dims(tf.reduce_max(spectra, axis=1), axis=1)
     return (spectra-minimum)/(maximum-minimum)
 
 x_coord = tf.linspace(0.0, 1.0, 1000)
@@ -22,7 +22,7 @@ spectrums1 = normalize(FBG_spectra(x_coord, X1, I1, W1))
 X2 = tf.random.uniform([samples, fbgs])
 I2 = tf.random.uniform([samples, fbgs], 0.1, 1)
 W2 = tf.random.uniform([samples, fbgs], 0.1, 0.3)
-spectrums2 = normalize(FBG_spectra(x_coord, X2, I2, W2))
+spectrums2 = normalize(FBG_spectra(x_coord, X2, I1, W2))
 
 train_X = tf.concat([tf.expand_dims(spectrums1, axis=1),
                      tf.expand_dims(spectrums2, axis=1)], axis=1)
@@ -40,5 +40,5 @@ e_model.fit(train_X, train_Y, epochs = 500, batch_size=1000)
 e_model.save_weights('./SavedModel/SignalErrorModel.hdf5')
 pred_Y = e_model(train_X)[:,0]
 print(pred_Y.shape, train_Y.shape)
-plt.plot(pred_Y-train_Y)
+plt.plot(pred_Y-train_Y, "o")
 plt.show()
