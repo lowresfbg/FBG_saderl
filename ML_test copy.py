@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 e_model, f_model = SignalError.ErrorModel()
 
 samples = 100
-fbgs = 2
+fbgs = 3
 
 def normalize(spectra):
     maximum = tf.expand_dims(tf.reduce_max(spectra, axis=1), axis=1)
@@ -24,16 +24,17 @@ x_coord = tf.linspace(0.0, 1.0, 1000)
 # W2 = tf.random.uniform([samples, fbgs], 0.01, 0.2)
 # spectrums2 = normalize(FBG_spectra(x_coord, X2, I1, W2))
 
-goal_X = tf.constant([0.4,0.6], dtype= tf.dtypes.float32)
-wrong_X = tf.constant([0.6,0.4], dtype= tf.dtypes.float32)
+goal_X = tf.constant([0.3,0.7,0.4], dtype= tf.dtypes.float32)
+wrong_X = tf.constant([0.3,0.4,0.7], dtype= tf.dtypes.float32)
 
 X1 = tf.repeat([goal_X], samples, axis=0)
-I1 =  tf.repeat([[1,0.5]], samples, axis=0)
+I1 =  tf.repeat([[1,0.5,0.25]], samples, axis=0)
 W1 = tf.ones([samples, fbgs])*0.1
 spectrums1 = normalize(FBG_spectra(x_coord, X1, I1, W1))
 
 X2 = tf.expand_dims(tf.linspace(-2.0,4.0,samples),axis=1)*(wrong_X-goal_X)+goal_X
-spectrums2 = normalize(FBG_spectra(x_coord, X2, I1, W1))
+spectrums2 = normalize(FBG_spectra(x_coord, X2, I1, W1)+
+                       tf.random.uniform([samples, 1000])*1e-5)
 
 
 
@@ -41,6 +42,7 @@ train_X = tf.concat([tf.expand_dims(spectrums1, axis=1),
                      tf.expand_dims(spectrums2, axis=1)], axis=1)
                 
 train_Y = tf.reduce_mean(tf.abs(X2-X1), axis=1)
+Spectra_diff = tf.reduce_mean(tf.abs(spectrums1-spectrums2), axis=1)
 
 
 
@@ -62,4 +64,6 @@ pred_Y = e_model(train_X)[:,0]
 print(pred_Y.shape, train_Y.shape)
 plt.plot(train_Y, "o")
 plt.plot(pred_Y, "-o")
+plt.twinx()
+plt.plot(Spectra_diff, c="red")
 plt.show()
