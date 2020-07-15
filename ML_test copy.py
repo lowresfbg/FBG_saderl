@@ -35,6 +35,8 @@ spectrums1 = normalize(FBG_spectra(x_coord, X1, I1, W1))
 X2 = tf.expand_dims(tf.linspace(-2.0,4.0,samples),axis=1)*(wrong_X-goal_X)+goal_X
 spectrums2 = normalize(FBG_spectra(x_coord, X2, I1, W1))
 
+
+
 train_X = tf.concat([tf.expand_dims(spectrums1, axis=1),
                      tf.expand_dims(spectrums2, axis=1)], axis=1)
                 
@@ -59,5 +61,5 @@ e_model.load_weights('./SavedModel/SignalErrorModel.hdf5')
 pred_Y = e_model(train_X)[:,0]
 print(pred_Y.shape, train_Y.shape)
 plt.plot(train_Y, "o")
-plt.plot(pred_Y)
+plt.plot(pred_Y, "-o")
 plt.show()
