@@ -35,8 +35,8 @@ train_Y = tf.reduce_mean(tf.abs(X2-X1), axis=1)
 
 e_model.summary()
 e_model.load_weights('./SavedModel/SignalErrorModel.hdf5')
-e_model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
-e_model.fit(train_X, train_Y, epochs = 500, batch_size=1000)
+e_model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-2), loss="mse")
+e_model.fit(train_X, train_Y, epochs = 10, batch_size=500)
 e_model.save_weights('./SavedModel/SignalErrorModel.hdf5')
 pred_Y = e_model(train_X)[:,0]
 print(pred_Y.shape, train_Y.shape)
