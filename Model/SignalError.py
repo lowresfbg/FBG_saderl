@@ -21,7 +21,7 @@ def ErrorModel():
     feature1 = feature_model(spectra_input[:,0])
     feature2 = feature_model(spectra_input[:,1])
     x = tf.abs(feature1-feature2)
-    x = tf.keras.layers.Dense(10, activation='sigmoid')(x)
+    # x = tf.keras.layers.Dense(10, activation='sigmoid')(x)
     x = tf.keras.layers.Dense(1)(x)
 
     return tf.keras.Model(spectra_input, x), feature_model
