@@ -50,6 +50,13 @@ def DATASET_3fbg_1():
 def DATASET_3fbg_perfect():
     return load_folder("Measured/3fbg/perfect")
 
+
+def DATASET_3fbg_2():
+    return load_folder("Measured/3fbg/2move")
+
+def DATASET_3fbg_2_noise():
+    return load_folder("Measured/3fbg/2noisemove")
+
 def DATASET_1fbg_differentResolution():
     return load_folder("Measured/1fbg/DifferentResolution")
 

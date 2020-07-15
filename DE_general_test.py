@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 from Solution.DE_general import DE, spectra_diff_contrast, spectra_diff_absolute
 
 from Dataset.Simulation.GaussCurve_TF import FBG_spectra, GaussCurve
-from Dataset.loader import DATASET_3fbg_perfect as Dataset
+
+# DATASET!!!!!!!!!!!!!
+from Dataset.loader import DATASET_3fbg_2_noise as Dataset
 
 from Algorithms.PeakFinder import FindPeaks
 
@@ -62,7 +64,7 @@ def init(de):
     de.NP = 50
     de.CR = 0.6
     de.F = 1
-    de.EarlyStop_threshold = 1e-3
+    de.EarlyStop_threshold = 1e-2
     de.spectra_diff = spectra_diff_absolute
 
 

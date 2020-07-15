@@ -9,7 +9,7 @@ fbgs = 5
 
 def normalize(spectra):
     maximum = tf.expand_dims(tf.reduce_max(spectra, axis=1), axis=1)
-    minimum = tf.expand_dims(tf.reduce_max(spectra, axis=1), axis=1)
+    minimum = tf.expand_dims(tf.reduce_min(spectra, axis=1), axis=1)
     return (spectra-minimum)/(maximum-minimum)
 
 x_coord = tf.linspace(0.0, 1.0, 1000)
