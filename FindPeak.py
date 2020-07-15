@@ -9,7 +9,6 @@ with open('peak.csv','w',newline='') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(['data','peak1','peak2','peak3'])
     for i in range(0,len(dataset)):
-        table = ''
         A = np.array(FindPeaks(dataset[i], 1e-5)).astype(float)[:,1].T
         writer.writerow([i,*A])
 
