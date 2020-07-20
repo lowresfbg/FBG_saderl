@@ -17,10 +17,8 @@ def Encoder(fbg_count):
 def Decoder(fbg_count):
     represent_input = tf.keras.Input((fbg_count*5,))
     x = tf.expand_dims(represent_input, axis=2)
-    x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(125))(x)
+    x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(125,use_bias=False))(x)
     x = tf.keras.layers.Permute((2,1))(x)
-
-    x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(125))(x)
 
     x = tf.keras.layers.UpSampling1D(2)(x)
     x = tf.keras.layers.Conv1D(fbg_count*20, 5, activation='relu', padding='same')(x)
@@ -33,7 +31,8 @@ def Decoder(fbg_count):
     return tf.keras.Model(represent_input, x)
 
 
-
+Encoder(5).summary()
+Decoder(5).summary()
 
 def GetModel(fbg_count):
     spectra_input = tf.keras.Input((1000,))
