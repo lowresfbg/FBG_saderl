@@ -1,12 +1,11 @@
 import matplotlib.pyplot as plt
 
-
 from Solution.DE_general import DE, spectra_diff_contrast, spectra_diff_absolute
 
 from Dataset.Simulation.GaussCurve_TF import FBG_spectra, GaussCurve
 
 # DATASET!!!!!!!!!!!!!
-from Dataset.loader import DATASET_3fbg_2_noise as Dataset
+from Dataset.loader import DATASET_3fbg_1 as Dataset
 
 from Algorithms.PeakFinder import FindPeaks
 
@@ -19,25 +18,42 @@ from AutoFitAnswer import Get3FBGAnswer
 
 print('loading dataset')
 # [:,:,948-76:1269-76]
-dataset = tf.constant(Dataset(), dtype=tf.dtypes.float32)
+dataset = tf.constant(Dataset(), dtype=tf.dtypes.float32)[::4,:,::5]
+answer = tf.constant(np.array(Get3FBGAnswer()).T, dtype=tf.dtypes.float32)[::4]
+print(dataset.shape)
 
-# plt.plot(*dataset[17])
-# plt.show()
 
-# peaks = tf.constant(FindPeaks(dataset[0], 1e-5), dtype=tf.dtypes.float32)
-peaks = tf.constant(FindPeaks(dataset[17], 0.12), dtype=tf.dtypes.float32)
+from scipy.interpolate import interp1d
+
+plt.plot(*dataset[5])
+
+x_coord = np.linspace(np.min(dataset[:,0]), np.max(dataset[:,0]), 10000)
+new_dataset = []
+for i in range(dataset.shape[0]):
+    new_dataset.append(interp1d(dataset[i,0], dataset[i,1],  kind='cubic')(x_coord))
+dataset = tf.cast(tf.concat([
+    tf.repeat([[x_coord]], dataset.shape[0], axis=0),
+    np.expand_dims(new_dataset, axis=1)], axis=1), tf.dtypes.float32)
+
+print(dataset.shape)
+
+plt.plot(*dataset[5])
+plt.show()
+
+peaks = tf.constant(FindPeaks(dataset[0], 1e-5), dtype=tf.dtypes.float32)
+# peaks = tf.constant(FindPeaks(dataset[17], 0.12), dtype=tf.dtypes.float32)
 
 print(peaks)
 
 
-# I = peaks[:, 2]*1e3 
-# W = peaks[:, 0]*0.9
+I = peaks[:, 2]*1e3
+W = peaks[:, 0]*0.9
 
-I = tf.constant([1, 0.5, 0.25], dtype=tf.dtypes.float32)*1e3 
-W = tf.constant([0.5264,0.5264,0.5264], dtype=tf.dtypes.float32)
+# for perfect
+# I = tf.constant([1, 0.5, 0.25], dtype=tf.dtypes.float32)*1e3 
+# W = tf.constant([0.5264,0.5264,0.5264], dtype=tf.dtypes.float32)
 
 # ## answer
-# answer = tf.constant(np.array(Get3FBGAnswer()).T, dtype=tf.dtypes.float32)
 # spectra = FBG_spectra(dataset[0][0], answer, I, W)
 # dataset = tf.concat(
 #     [
@@ -51,7 +67,7 @@ print(dataset)
 
 
 print('loading completed')
-ITERATION = 1000
+ITERATION = 500
 
 de = DE()
 
@@ -61,10 +77,10 @@ def init(de):
     de.maxx = 1549.0
     de.I = I
     de.W = W
-    de.NP = 50
+    de.NP = 200
     de.CR = 0.6
-    de.F = 1
-    de.EarlyStop_threshold = 1e-2
+    de.F = 0.99
+    de.EarlyStop_threshold = 1e-3
     de.spectra_diff = spectra_diff_absolute
 
 
@@ -73,13 +89,14 @@ init(de)
 
 sl = SingleLogger(I, W)
 
+# RUN SINGLE TEST
 print("start single test")
 
-de.afterEach.append(sl.log)
-de.run(dataset[6], max_iter=ITERATION)
+# de.afterEach.append(sl.log)
+# de.run(dataset[36], max_iter=ITERATION)
+# sl.PlotFigure()
+# plt.show()
 print("single test complete")
-sl.PlotFigure()
-plt.show()
 
 
 X_log = []
@@ -96,16 +113,27 @@ def evaluateData(data):
 
     plt.clf()
 
-    plt.plot(X_log, "o-")
-    plt.twinx()
-    plt.plot(err_log)
+    plt.plot(answer,"--" ,color='gray')
+    for i in range(X_log[0].shape[0]):
+        plt.plot(np.array(X_log)[:,i], "o-", label="FBG{}".format(i+1))
+    
 
+    # plt.twinx()
+    # plt.plot(err_log)
+    plt.legend()
+    plt.xlabel("Test set")
+    plt.ylabel("Wavelength")
     plt.pause(0.01)
+    plt.tight_layout()
     return X
+
 
 
 print("start multiple")
 Xs = tf.map_fn(evaluateData, dataset)
 
+X_log = np.array(X_log)
+error = np.sqrt(np.mean((X_log - answer)**2))
+print(error)
 # print(Xs)
 plt.show()

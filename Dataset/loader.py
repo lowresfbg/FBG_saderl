@@ -1,18 +1,26 @@
 import os
 from . import reader
 import re
-
+import csv
+import numpy as np
 
 dirname = os.path.dirname(__file__)
 
 # loading helper
 def load_folder(folder):
     data = []
+    answer = None
     folder_name = os.path.join(dirname, folder)
     for f in os.listdir(folder_name):
         if re.match('.*\\.csv$', f):
             filepath = os.path.join(folder_name, f)
             data.append(reader.read_csv(filepath))
+        if re.match('answer.txt'):
+            filepath = os.path.join(folder_name, f)
+            with open(filepath, 'r') as f:
+                answer = np.array(list(csv.reader(f)))[:,1:]
+    if answer is not None:
+        data = np.concatenate([data, answer], axis=1)
     return data
 
 # load data sets
@@ -43,6 +51,8 @@ def DATASET_5fbg_3_2():
 def DATASET_5fbg_3_3():
     return load_folder("Measured/5fbg/strain FBG1 _ FBG2 _ FBG3/only FBG3")
 
+def DATASET_5fbg_1_perfect():
+    return load_folder("Measured/5fbg/perfect")
 
 def DATASET_3fbg_1():
     return load_folder("Measured/3fbg/strain FBG1")

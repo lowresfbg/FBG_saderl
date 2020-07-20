@@ -73,3 +73,8 @@ plt.twinx()
 plt.plot(Spectra_diff, c="red", label="Spectra difference")
 plt.legend()
 plt.show()
+
+pred_Y1 = f_model(spectrums1)
+pred_Y2 = f_model(spectrums2)
+plt.plot(pred_Y1-pred_Y2)
+plt.show()

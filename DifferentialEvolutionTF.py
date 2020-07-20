@@ -55,11 +55,12 @@ def plotPause(info):
     if i % 10 == 0:
         plt.clf()
         plot(data, X)
-        plt.pause(0.02)
+        # plt.pause(0.02)
+        # plt.savefig("./render/{:04d}.png".format(i//10))
 
 
-# detf.run(dataset[12], iterations=ITERATION, forEach=plotPause)
-# plt.show()
+detf.run(dataset[20], iterations=ITERATION, forEach=plotPause)
+plt.show()
 
 
 class Plotter():

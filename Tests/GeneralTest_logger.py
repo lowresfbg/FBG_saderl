@@ -58,8 +58,9 @@ class SingleLogger:
 
         if self.Animate and i % 10 == 0:
             self.PlotFigure()
-
+            
             plt.pause(0.02)
+            # plt.savefig("./render/{:04d}.png".format(i//10))
 
 
 class DatasetConfig:
