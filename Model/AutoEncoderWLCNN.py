@@ -30,9 +30,9 @@ def Decoder(fbg_count):
 
     return tf.keras.Model(represent_input, x)
 
-
-Encoder(5).summary()
-Decoder(5).summary()
+if __name__ == "__main__":
+    Encoder(5).summary()
+    Decoder(5).summary()
 
 def GetModel(fbg_count):
     spectra_input = tf.keras.Input((1000,))
