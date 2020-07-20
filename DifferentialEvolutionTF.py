@@ -9,6 +9,7 @@ from Dataset.loader import DATASET_5fbg_1 as Dataset
 
 import tensorflow as tf
 
+
 print('loading dataset')
 dataset = tf.constant(Dataset(), dtype=tf.dtypes.float32)#[:,:,948-76:1269-76]
 print('dataset load done')
