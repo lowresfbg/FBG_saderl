@@ -5,7 +5,9 @@ from Solution.DE_general import DE, spectra_diff_contrast, spectra_diff_absolute
 from Dataset.Simulation.GaussCurve_TF import FBG_spectra, GaussCurve
 
 # DATASET!!!!!!!!!!!!!
-from Dataset.loader import DATASET_3fbg_1 as Dataset
+from Dataset.loader import DATASET_3fbg_1_2 as Dataset
+from Dataset.loader import DATASET_background
+from Dataset import Resampler
 
 from Algorithms.PeakFinder import FindPeaks
 
@@ -18,29 +20,37 @@ from AutoFitAnswer import Get3FBGAnswer
 
 print('loading dataset')
 # [:,:,948-76:1269-76]
-dataset = tf.constant(Dataset(), dtype=tf.dtypes.float32)[::4,:,::5]
-answer = tf.constant(np.array(Get3FBGAnswer()).T, dtype=tf.dtypes.float32)[::4]
+dataset, answer, peaks = Resampler.Resample(Dataset(), 3)
+
+background = Resampler.Sample(DATASET_background(), 1000,50)
+
+
+
+# dataset = tf.constant(Dataset(), dtype=tf.dtypes.float32)[::4,:,::5]
+# answer = tf.constant(np.array(Get3FBGAnswer()).T, dtype=tf.dtypes.float32)[::4]
 print(dataset.shape)
 
 
-from scipy.interpolate import interp1d
+# from scipy.interpolate import interp1d
+
+# plt.plot(*dataset[5])
+
+# x_coord = np.linspace(np.min(dataset[:,0]), np.max(dataset[:,0]), 10000)
+# new_dataset = []
+# for i in range(dataset.shape[0]):
+#     new_dataset.append(interp1d(dataset[i,0], dataset[i,1],  kind='cubic')(x_coord))
+# dataset = tf.cast(tf.concat([
+#     tf.repeat([[x_coord]], dataset.shape[0], axis=0),
+#     np.expand_dims(new_dataset, axis=1)], axis=1), tf.dtypes.float32)
+
+# print(dataset.shape)
 
 plt.plot(*dataset[5])
-
-x_coord = np.linspace(np.min(dataset[:,0]), np.max(dataset[:,0]), 10000)
-new_dataset = []
-for i in range(dataset.shape[0]):
-    new_dataset.append(interp1d(dataset[i,0], dataset[i,1],  kind='cubic')(x_coord))
-dataset = tf.cast(tf.concat([
-    tf.repeat([[x_coord]], dataset.shape[0], axis=0),
-    np.expand_dims(new_dataset, axis=1)], axis=1), tf.dtypes.float32)
-
-print(dataset.shape)
-
-plt.plot(*dataset[5])
+plt.twinx()
+plt.plot(dataset[5][0], dataset[5][1] / background[0,1], c='red')
 plt.show()
 
-peaks = tf.constant(FindPeaks(dataset[0], 1e-5), dtype=tf.dtypes.float32)
+# peaks = tf.constant(FindPeaks(dataset[0], 1e-5), dtype=tf.dtypes.float32)
 # peaks = tf.constant(FindPeaks(dataset[17], 0.12), dtype=tf.dtypes.float32)
 
 print(peaks)

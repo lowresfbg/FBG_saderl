@@ -11,16 +11,15 @@ from AutoFitAnswer import GetFBGAnswer
 
 import numpy as np
 
-from Dataset.loader import DATASET_5fbg_1_perfect as Dataset
+from Dataset.loader import DATASET_3fbg_1_2 as Dataset
 from Algorithms.PeakFinder import FindPeaks
 
-from AutoFitAnswer import Get3FBGAnswer
 
 # resample
 from scipy.interpolate import interp1d
 
 threshold = 1.5e-5  # 3fbg-2
-fbg_count = 5
+fbg_count = 3
 # threshold =  1.5e-5 # 3fbg-2
 
 
@@ -70,7 +69,7 @@ dataset, answer, peaks = Resample(1, 10000)
 fbgs = len(peaks)
 
 I = peaks[:, 2]*1e3
-W = peaks[:, 0]
+W = peaks[:, 0] *0.9
 
 model = WavelengthCNN.GetModel(fbgs)
 
@@ -154,7 +153,7 @@ plt.show()
 # plt.show()
 
 
-model.compile(optimizer=tf.keras.optimizers.Adam(lr=5e-4), loss="mse")
+model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
 
 
 def plot_ml(batch, logs):
@@ -187,7 +186,7 @@ sample_weight = (sample_weight - sample_weight_max) / \
     (sample_weight_min-sample_weight_max)
 sample_weight = sample_weight*0.8+0.2
 
-model.fit(train_X, train_Y-1545, epochs=300, batch_size=2000, validation_split=0.0, shuffle=True,
+model.fit(train_X, train_Y-1545, epochs=400, batch_size=2000, validation_split=0.0, shuffle=True,
           sample_weight=sample_weight,
           callbacks=[tf.keras.callbacks.LambdaCallback(on_epoch_end=plot_ml)])
 pred_Y = model(test_X)+1545

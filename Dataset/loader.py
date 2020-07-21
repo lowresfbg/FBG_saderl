@@ -101,3 +101,8 @@ def DATASET_3fbg_2_noise():
 
 def DATASET_1fbg_differentResolution():
     return load_folder("Measured/1fbg/DifferentResolution")
+
+# background
+
+def DATASET_background():
+    return load_folder("Measured/background")

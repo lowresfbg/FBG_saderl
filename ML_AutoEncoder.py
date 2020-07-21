@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 fbgs = 5
 samples = 2000
 
-encdec, model = AutoEncoderWLCNN.GetModel(5)
+encdec, model = AutoEncoderWLCNN.GetModel(3)
 
 
 
