@@ -4,7 +4,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 fbgs = 5
-samples = 2000
+samples = 40000
 
 encdec, model = AutoEncoderWLCNN.GetModel(3)
 
@@ -20,30 +20,31 @@ x_coord = tf.linspace(0.0, 1.0, 1000)
 
 X1 = tf.random.uniform([samples, fbgs])
 I1 = tf.random.uniform([samples, fbgs])
-W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.05, 0.15)
+W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.02, 0.05)
 spectrums1 = normalize(FBG_spectra(x_coord, X1, I1, W1))
 
 
-train_X = spectrums1
+train_X = spectrums1 + (tf.random.uniform([samples, 1000])-0.5)*1e-2
 
 train_Y = spectrums1
 
-plt.plot(spectrums1[0])
+plt.plot(train_X[0])
+plt.plot(train_Y[0])
 plt.show()
 
 encdec.summary()
 encdec.load_weights('./SavedModel/EncDecModel.hdf5')
 
-encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-2), loss="mse")
+encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-4), loss="mse")
 
-for i in range(10):
+for i in range(5):
     print("training cycle", i)
     encdec.fit(train_X, train_Y, epochs=10, batch_size=2000, validation_split=0.2, shuffle=True)
     encdec.save_weights('./SavedModel/EncDecModel.hdf5')
 
-pred_Y = encdec(train_X)
+pred_Y = encdec(train_X[:10])
 print(pred_Y.shape, train_Y.shape)
-for i in range(samples):
+for i in range(10):
     plt.plot(pred_Y[i], "o")
     plt.plot(train_Y[i], "-")
     plt.show()
