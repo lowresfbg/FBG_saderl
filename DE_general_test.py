@@ -20,11 +20,26 @@ from AutoFitAnswer import Get3FBGAnswer
 
 print('loading dataset')
 # [:,:,948-76:1269-76]
-dataset, answer, peaks = Resampler.Resample(Dataset(), 3)
 
-background = Resampler.Sample(DATASET_background(), 1000,50)
+dataset = Dataset()
+background = Resampler.Sample(DATASET_background(), len(dataset[0][0]),50)[0][1]
+
+newDataset = []
+for data in dataset:
+    newDataset.append(np.array([
+            data[0],
+            data[1] / background
+        ]))
+
+ymax = np.max(newDataset[0][1])
+ymin = np.min(newDataset[0][1])
+threshold = (ymax-ymin)*0.1+ymin
 
 
+dataset, answer, peaks = Resampler.Resample(newDataset, 3, 1, 1000, threshold)
+
+# plt.plot(*background[0])
+# plt.show()
 
 # dataset = tf.constant(Dataset(), dtype=tf.dtypes.float32)[::4,:,::5]
 # answer = tf.constant(np.array(Get3FBGAnswer()).T, dtype=tf.dtypes.float32)[::4]
@@ -46,8 +61,6 @@ print(dataset.shape)
 # print(dataset.shape)
 
 plt.plot(*dataset[5])
-plt.twinx()
-plt.plot(dataset[5][0], dataset[5][1] / background[0,1], c='red')
 plt.show()
 
 # peaks = tf.constant(FindPeaks(dataset[0], 1e-5), dtype=tf.dtypes.float32)

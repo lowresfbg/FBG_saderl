@@ -3,11 +3,11 @@ import tensorflow as tf
 def Encoder():
     spectra_input = tf.keras.Input((1000,))
     x = tf.expand_dims(spectra_input, axis=2)
-    x = tf.keras.layers.Conv1D(128, 3, activation='elu', padding='same')(x)
+    x = tf.keras.layers.Conv1D(100, 10, activation='elu', padding='same')(x)
     x = tf.keras.layers.MaxPooling1D(2)(x)
-    x = tf.keras.layers.Conv1D(64, 5, activation='elu', padding='same')(x)
+    x = tf.keras.layers.Conv1D(100, 10, activation='elu', padding='same')(x)
     x = tf.keras.layers.MaxPooling1D(2)(x)
-    x = tf.keras.layers.Conv1D(32, 5, activation='elu', padding='same')(x)
+    x = tf.keras.layers.Conv1D(50, 10, activation='elu', padding='same')(x)
     x = tf.keras.layers.MaxPooling1D(2)(x)
     x = tf.keras.layers.Permute((2,1))(x)
     x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(1))(x)
@@ -15,17 +15,17 @@ def Encoder():
     return tf.keras.Model(spectra_input, x)
 
 def Decoder():
-    represent_input = tf.keras.Input((32,))
+    represent_input = tf.keras.Input((50,))
     x = tf.expand_dims(represent_input, axis=2)
     x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(125,use_bias=False,activation='elu'))(x)
     x = tf.keras.layers.Permute((2,1))(x)
 
     x = tf.keras.layers.UpSampling1D(2)(x)
-    x = tf.keras.layers.Conv1D(64, 5, activation='elu', padding='same')(x)
+    x = tf.keras.layers.Conv1D(100, 10, activation='elu', padding='same')(x)
     x = tf.keras.layers.UpSampling1D(2)(x)
-    x = tf.keras.layers.Conv1D(128, 5, activation='elu', padding='same')(x)
+    x = tf.keras.layers.Conv1D(100, 10, activation='elu', padding='same')(x)
     x = tf.keras.layers.UpSampling1D(2)(x)
-    x = tf.keras.layers.Conv1D(1, 3, activation='linear', padding='same')(x)
+    x = tf.keras.layers.Conv1D(1, 10, activation='linear', padding='same')(x)
     x = tf.keras.layers.Flatten()(x)
 
     return tf.keras.Model(represent_input, x)

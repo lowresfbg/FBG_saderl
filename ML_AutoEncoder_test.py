@@ -30,7 +30,9 @@ dataset, answer, peaks = Resampler.Resample(DATASET_3fbg_1_2(), 3)
 spectrums1 = normalize(dataset[:, 1])
 x_coord = dataset[0, 0]
 
-train_X = spectrums1
+maxy = np.max(spectrums1[0])
+
+train_X = spectrums1 / maxy
 
 train_Y = spectrums1
 train_Y_wl = answer
@@ -38,7 +40,7 @@ train_Y_wl = answer
 # plt.show()
 
 encdec.summary()
-# encdec.load_weights('./SavedModel/EncDecModel.hdf5')
+encdec.load_weights('./SavedModel/EncDecModel.hdf5')
 
 # for layer in encdec.layers:
 #     layer.trainable = False
