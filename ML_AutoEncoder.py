@@ -35,7 +35,7 @@ plt.show()
 encdec.summary()
 encdec.load_weights('./SavedModel/EncDecModel.hdf5')
 
-encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=2e-3), loss="mse")
+encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
 
 for i in range(200):
     print("training cycle", i)
