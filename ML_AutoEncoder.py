@@ -3,7 +3,7 @@ from Dataset.Simulation.GaussCurve_TF import FBG_spectra
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-fbgs = 10
+fbgs = 5
 samples = 40000
 
 encdec, model = AutoEncoderWLCNN.GetModel(3)
