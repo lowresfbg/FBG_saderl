@@ -22,6 +22,39 @@ def spectra_diff_absolute(A, B):
     return tf.reduce_sum(tf.abs(A-B), axis=1)
 
 
+def spectra_feature(A, miny, maxy, resolution=10):
+    ys = tf.repeat([tf.linspace(0.0, 1.0, resolution)], tf.shape(A)[0], axis=0) * (maxy-miny) + miny
+    ys = tf.expand_dims(ys, axis=2)
+    AN = tf.repeat(tf.expand_dims(A, axis=1), resolution, axis=1)
+    xs = tf.linspace(0.0,1.0,tf.shape(A)[1])[tf.newaxis,tf.newaxis,:]
+
+    sy = tf.cast(AN>ys, tf.dtypes.float32)
+
+    return tf.reduce_sum(xs*sy, axis=2) / (tf.reduce_sum(sy,axis=2)+1e-3)
+
+    
+
+
+@tf.function
+def spectra_diff_special(A, B):
+    miny = tf.reduce_min(A, axis=1)
+    maxy = tf.reduce_max(A, axis=1)
+
+    fA = spectra_feature(A, miny[:,tf.newaxis], maxy[:,tf.newaxis])
+    # tf.print(fA)
+    fB = spectra_feature(B[tf.newaxis, :], miny[:,tf.newaxis], maxy[:,tf.newaxis])
+
+
+    es = tf.reduce_mean(tf.abs(A-B), axis=1)/maxy
+    ef = tf.reduce_mean((fA-fB)**2, axis=1)
+
+    # tf.print(ef)
+
+
+    return ef*0.01+es
+
+
+
 @tf.function
 def Evaluate(data, X, I, W, spectra_diff=spectra_diff):
     I = tf.repeat([I], X.shape[0], axis=0)
@@ -62,7 +95,6 @@ def computeRange(data, I):
 
     max_xn = tf.reduce_max(xs*mask, axis=1)
     min_xn = tf.reduce_min(xs+(1-mask)*1e20, axis=1)
-    # print(xs, ys,max_xn, min_xn)
 
     return max_xn+0.1, min_xn-0.1
 
@@ -115,7 +147,7 @@ class DE(tf.keras.Model):
                                  self.CR,  self.F,
                                  max_xn, min_xn,
                                  self.I,  tf.constant(self.W),
-                                 spectra_diff)
+                                 self.spectra_diff)
         i = i+1
 
         max_dist = tf.reduce_max(tf.reduce_max(self.X, axis=0) -

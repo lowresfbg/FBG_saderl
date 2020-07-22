@@ -22,6 +22,8 @@ print('loading dataset')
 # [:,:,948-76:1269-76]
 
 dataset = Dataset()
+
+# HERE IS THE MAGIC...
 background = Resampler.Sample(DATASET_background(), len(dataset[0][0]),50)[0][1]
 
 newDataset = []
@@ -37,6 +39,12 @@ threshold = (ymax-ymin)*0.1+ymin
 
 
 dataset, answer, peaks = Resampler.Resample(newDataset, 3, 1, 1000, threshold)
+
+
+# feature = spectra_feature(dataset[:,1], tf.reduce_mean(dataset[:,1]), tf.reduce_max(dataset[:,1]), 100)
+# print(feature)
+# plt.plot(tf.transpose(feature))
+# plt.show()
 
 # plt.plot(*background[0])
 # plt.show()
@@ -60,8 +68,8 @@ print(dataset.shape)
 
 # print(dataset.shape)
 
-plt.plot(*dataset[5])
-plt.show()
+# plt.plot(*dataset[5])
+# plt.show()
 
 # peaks = tf.constant(FindPeaks(dataset[0], 1e-5), dtype=tf.dtypes.float32)
 # peaks = tf.constant(FindPeaks(dataset[17], 0.12), dtype=tf.dtypes.float32)
@@ -85,8 +93,8 @@ W = peaks[:, 0]*0.9
 #     ],
 #     axis=1)
 
-print(dataset)
-
+# print(dataset)
+# 
 
 
 print('loading completed')
@@ -115,10 +123,10 @@ sl = SingleLogger(I, W)
 # RUN SINGLE TEST
 print("start single test")
 
-# de.afterEach.append(sl.log)
-# de.run(dataset[36], max_iter=ITERATION)
-# sl.PlotFigure()
-# plt.show()
+de.afterEach.append(sl.log)
+de.run(dataset[3], max_iter=ITERATION)
+sl.PlotFigure()
+plt.show()
 print("single test complete")
 
 
