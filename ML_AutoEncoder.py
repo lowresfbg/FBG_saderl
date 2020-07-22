@@ -3,7 +3,7 @@ from Dataset.Simulation.GaussCurve_TF import FBG_spectra
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-fbgs = 5
+fbgs = 10
 samples = 40000
 
 encdec, model = AutoEncoderWLCNN.GetModel(3)
@@ -35,7 +35,7 @@ plt.show()
 encdec.summary()
 encdec.load_weights('./SavedModel/EncDecModel.hdf5')
 
-encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=2e-5), loss="mse")
+encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=5e-5), loss="mse")
 
 for i in range(50):
     print("training cycle", i)
