@@ -12,48 +12,68 @@ from AutoFitAnswer import GetFBGAnswer
 import numpy as np
 
 from Dataset.loader import DATASET_3fbg_1_2 as Dataset
+from Dataset.loader import DATASET_background
 from Algorithms.PeakFinder import FindPeaks
 
 
 # resample
-from scipy.interpolate import interp1d
+from Dataset import Resampler
 
 threshold = 1.5e-5  # 3fbg-2
 fbg_count = 3
 # threshold =  1.5e-5 # 3fbg-2
 
 
-def Resample(skip=1, target=1000):
-    dataset = Dataset()
+# def Resample(skip=1, target=1000):
+#     dataset = Dataset()
 
-    if type(dataset) is tuple:
-        print('is tuple!')
-        dataset, answertable = dataset
-        answer = answertable[:, :fbg_count]
-        peaks = tf.constant(np.concatenate([
-            answertable[0, fbg_count:fbg_count*2, np.newaxis],
-            answertable[0, :fbg_count, np.newaxis],
-            answertable[0, fbg_count*2:, np.newaxis],
-        ], axis=1), dtype=tf.dtypes.float32)
-    else:
-        answer = np.array(GetFBGAnswer(dataset, 3, threshold)).T
-        peaks = tf.constant(
-            FindPeaks(dataset[0], threshold), dtype=tf.dtypes.float32)
+#     if type(dataset) is tuple:
+#         print('is tuple!')
+#         dataset, answertable = dataset
+#         answer = answertable[:, :fbg_count]
+#         peaks = tf.constant(np.concatenate([
+#             answertable[0, fbg_count:fbg_count*2, np.newaxis],
+#             answertable[0, :fbg_count, np.newaxis],
+#             answertable[0, fbg_count*2:, np.newaxis],
+#         ], axis=1), dtype=tf.dtypes.float32)
+#     else:
+#         answer = np.array(GetFBGAnswer(dataset, 3, threshold)).T
+#         peaks = tf.constant(
+#             FindPeaks(dataset[0], threshold), dtype=tf.dtypes.float32)
 
-    dataset = tf.constant(dataset, dtype=tf.dtypes.float32)[:, :, ::skip]
-    x_coord = np.linspace(np.min(dataset[:, 0]), np.max(dataset[:, 0]), target)
-    new_dataset = []
-    for i in range(dataset.shape[0]):
-        new_dataset.append(
-            interp1d(dataset[i, 0], dataset[i, 1],  kind='cubic')(x_coord))
-    dataset = tf.cast(tf.concat([
-        tf.repeat([[x_coord]], dataset.shape[0], axis=0),
-        np.expand_dims(new_dataset, axis=1)], axis=1), tf.dtypes.float32)
+#     dataset = tf.constant(dataset, dtype=tf.dtypes.float32)[:, :, ::skip]
+#     x_coord = np.linspace(np.min(dataset[:, 0]), np.max(dataset[:, 0]), target)
+#     new_dataset = []
+#     for i in range(dataset.shape[0]):
+#         new_dataset.append(
+#             interp1d(dataset[i, 0], dataset[i, 1],  kind='cubic')(x_coord))
+#     dataset = tf.cast(tf.concat([
+#         tf.repeat([[x_coord]], dataset.shape[0], axis=0),
+#         np.expand_dims(new_dataset, axis=1)], axis=1), tf.dtypes.float32)
 
-    return dataset, answer, peaks
+#     return dataset, answer, peaks
+
+# HERE IS THE MAGIC... removing uneven level
+dataset = Dataset()
+background = Resampler.Sample(DATASET_background(), len(dataset[0][0]),100)[0][1]
+
+newDataset = []
+for data in dataset:
+    newDataset.append(np.array([
+            data[0],
+            data[1] / background
+        ]))
+
+ymax = np.max(newDataset[0][1])
+ymin = np.min(newDataset[0][1])
+threshold = (ymax-ymin)*0.1+ymin
 
 
-dataset, answer, peaks = Resample(1, 10000)
+dataset, answer, peaks = Resampler.Resample(newDataset, fbg_count, 1, 10000, threshold)
+
+
+
+
 # plt.plot(dataset[0][1])
 # plt.show()
 
@@ -130,7 +150,8 @@ def normalize(spectra):
     return (spectra-minimum)/(maximum-minimum)
 
 
-dataset, answer, peaks = Resample(1, 1000)
+dataset, answer, peaks = Resampler.Resample(newDataset, fbg_count, 1, 1000, threshold)
+
 
 train_X = normalize(dataset[:, 1])
 test_X = normalize(dataset[:, 1])
