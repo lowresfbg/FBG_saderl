@@ -3,7 +3,7 @@ from Dataset.Simulation.GaussCurve_TF import FBG_spectra
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-fbgs = 5
+fbgs = 10
 samples = 40000
 
 encdec, model = AutoEncoderWLCNN.GetModel(3)
@@ -20,7 +20,7 @@ x_coord = tf.linspace(0.0, 1.0, 1000)
 
 X1 = tf.random.uniform([samples, fbgs])
 I1 = tf.random.uniform([samples, fbgs])*2e3
-W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.03, 0.1)
+W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.02, 0.1)
 spectrums1 = FBG_spectra(x_coord, X1, I1, W1)
 
 
