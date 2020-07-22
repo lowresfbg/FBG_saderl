@@ -4,13 +4,13 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 
-from Dataset.loader import DATASET_3fbg_1_2
+from Dataset.loader import DATASET_5fbg_3_perfect as Dataset
 from Dataset import Resampler
 
 fbgs = 5
 samples = 20
 
-encdec, model = AutoEncoderWLCNN.GetModel(3)
+encdec, model = AutoEncoderWLCNN.GetModel(fbgs)
 
 
 def normalize(spectra):
@@ -26,7 +26,7 @@ I1 = tf.random.uniform([samples, fbgs])
 W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.05, 0.15)
 spectrums1 = normalize(FBG_spectra(x_coord, X1, I1, W1))
 
-dataset, answer, peaks = Resampler.Resample(DATASET_3fbg_1_2(), 3)
+dataset, answer, peaks = Resampler.Resample(Dataset(), fbgs)
 spectrums1 = normalize(dataset[:, 1])
 x_coord = dataset[0, 0]
 
@@ -36,8 +36,8 @@ train_X = spectrums1 / maxy
 
 train_Y = spectrums1
 train_Y_wl = answer
-# plt.plot(spectrums1[0])
-# plt.show()
+plt.plot(spectrums1[0])
+plt.show()
 
 encdec.summary()
 encdec.load_weights('./SavedModel/EncDecModel.hdf5')
@@ -85,7 +85,7 @@ logger = ML_logger(model)
 
 # print("training cycle", i)
 
-model.fit(train_X[::2], train_Y_wl[::2]-1545, epochs=500, batch_size=200, shuffle=True,
+model.fit(train_X[::4], train_Y_wl[::4]-1545, epochs=500, batch_size=200, shuffle=True,
           callbacks=[tf.keras.callbacks.LambdaCallback(on_epoch_end=logger.plot_ml)])
 model.save_weights('./SavedModel/EncDecWLModel.hdf5')
 

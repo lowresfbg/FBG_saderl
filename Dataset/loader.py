@@ -63,6 +63,9 @@ def DATASET_5fbg_3_1():
     return load_folder("Measured/5fbg/strain FBG1 _ FBG2 _ FBG3/only FBG1(3 units)")
 
 
+def DATASET_5fbg_3_perfect():
+    return load_folder("Measured/5fbg/perfect_3move")
+
 def DATASET_5fbg_3_2():
     return load_folder("Measured/5fbg/strain FBG1 _ FBG2 _ FBG3/only FBG2(2 units)")
 
