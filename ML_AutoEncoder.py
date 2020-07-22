@@ -20,7 +20,7 @@ x_coord = tf.linspace(0.0, 1.0, 1000)
 
 X1 = tf.random.uniform([samples, fbgs])
 I1 = tf.random.uniform([samples, fbgs])*2e3
-W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.02, 0.05)
+W1 = tf.ones([samples, fbgs]) * tf.random.uniform([1], 0.03, 0.05)
 spectrums1 = FBG_spectra(x_coord, X1, I1, W1)
 
 
@@ -35,9 +35,9 @@ plt.show()
 encdec.summary()
 encdec.load_weights('./SavedModel/EncDecModel.hdf5')
 
-encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
+encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=2e-3), loss="mse")
 
-for i in range(200):
+for i in range(5):
     print("training cycle", i)
     encdec.fit(train_X, train_Y, epochs=10, batch_size=2000, validation_split=0.2, shuffle=True)
     encdec.save_weights('./SavedModel/EncDecModel.hdf5')
