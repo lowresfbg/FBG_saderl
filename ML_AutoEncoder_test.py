@@ -45,7 +45,7 @@ encdec.load_weights('./SavedModel/EncDecModel.hdf5')
 # for layer in encdec.layers:
 #     layer.trainable = False
 
-model.compile(optimizer=tf.keras.optimizers.Adam(lr=2e-2), loss="mse")
+model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
 
 
 class ML_logger:
