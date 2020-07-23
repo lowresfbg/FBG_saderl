@@ -4,7 +4,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 fbgs = 3
-samples = 400
+samples = 100
 
 encdec, model = AutoEncoderWLCNN.GetModel(3)
 
@@ -33,11 +33,11 @@ plt.plot(train_Y[0])
 plt.show()
 
 encdec.summary()
-encdec.load_weights('./SavedModel/EncDecModel.hdf5')
+#encdec.load_weights('./SavedModel/EncDecModel.hdf5')
 
 encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=5e-5), loss="mse")
 
-for i in range(0):
+for i in range(10):
     print("training cycle", i)
     encdec.fit(train_X, train_Y, epochs=10, batch_size=1000, validation_split=0.2, shuffle=True)
     encdec.save_weights('./SavedModel/EncDecModel.hdf5')
