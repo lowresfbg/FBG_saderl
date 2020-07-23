@@ -8,14 +8,13 @@ def Encoder():
     x = tf.keras.layers.Conv1D(100, 5, activation='elu', padding='same')(x)
     x = tf.keras.layers.MaxPooling1D(2)(x)
     x = tf.keras.layers.Flatten()(x)
-    x = tf.keras.layers.Dense(50, activation='elu')(x)
+    x = tf.keras.layers.Dense(20, activation='linear')(x)
     return tf.keras.Model(spectra_input, x)
 
 def Decoder():
-    represent_input = tf.keras.Input((50,))
-    x = tf.keras.layers.Dense(20,activation='elu')(represent_input)
-    x = tf.keras.layers.Dense(50,activation='elu')(x)
-    x = tf.keras.layers.Dense(1000,activation='linear')(x)
+    represent_input = tf.keras.Input((20,))
+    x = tf.keras.layers.Dense(50,activation='elu')(represent_input)
+    x = tf.keras.layers.Dense(1000,activation='linear')(represent_input)
     return tf.keras.Model(represent_input, x)
 
 if __name__ == "__main__":
@@ -34,6 +33,7 @@ def GetModel(fbg_count):
     decoded = decoder(encoded)
 
 
+    wl = tf.keras.layers.Dense(fbg_count, activation="elu")(wl)
     wl = tf.keras.layers.Dense(fbg_count)(encoded)
 
     encdec = tf.keras.Model(spectra_input, decoded)
