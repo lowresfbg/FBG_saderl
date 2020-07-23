@@ -20,7 +20,7 @@ def Decoder():
     represent_input = tf.keras.Input((50,))
     x = tf.keras.layers.Dense(20,activation='elu')(represent_input)
     x = tf.keras.layers.Dense(50,activation='elu')(x)
-    x = tf.expand_dims(represent_input, axis=2)
+    x = tf.expand_dims(x, axis=2)
     x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(10,activation='elu'))(x)
     x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(50,activation='elu'))(x)
     x = tf.keras.layers.Permute((2,1))(x)
