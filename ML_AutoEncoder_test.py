@@ -58,7 +58,7 @@ def test(AE=True):
         # for layer in encdec.layers:
         #     layer.trainable = False
 
-    model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=2e-3), loss="mse")
 
 
     class ML_logger:
@@ -107,8 +107,8 @@ def test(AE=True):
 
     # print("training cycle", i)
 
-    model.fit(train_X, train_Y_wl-1545, epochs=500, batch_size=10000,
-            validation_split = 0.95,
+    model.fit(train_X, train_Y_wl-1545, epochs=2000, batch_size=10000,
+            validation_split = 0.8,
             callbacks=[tf.keras.callbacks.LambdaCallback(on_epoch_end=logger.plot_ml)])
     # model.save_weights('./SavedModel/EncDecWLModel.hdf5')
 

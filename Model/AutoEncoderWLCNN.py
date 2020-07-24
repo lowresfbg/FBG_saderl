@@ -8,27 +8,27 @@ def Encoder():
     x = tf.keras.layers.MaxPooling1D(2)(x)
     x = tf.keras.layers.Conv1D(8, 5, activation='elu', padding='same')(x)
     x = tf.keras.layers.MaxPooling1D(2)(x)
+    x = tf.keras.layers.Conv1D(8, 5, activation='elu', padding='same')(x)
+    x = tf.keras.layers.MaxPooling1D(2)(x)
+    x = tf.keras.layers.Conv1D(8, 3, activation='elu', padding='same')(x)
+    x = tf.keras.layers.MaxPooling1D(5)(x)
     
     return tf.keras.Model(spectra_input, x)
 
 def Decoder():
-    represent_input = tf.keras.Input((250,8))
+    represent_input = tf.keras.Input((25,8))
     x = represent_input
 
-    # x = tf.keras.layers.Conv1D(8, 5, activation='elu', padding='same')(x)
-    # x = tf.keras.layers.MaxPooling1D(2)(x)
-    # x = tf.keras.layers.Conv1D(8, 3, activation='elu', padding='same')(x)
-    # x = tf.keras.layers.MaxPooling1D(5)(x)
 
     # # x = tf.keras.layers.Conv1D(1, 1, activation='elu', padding='same')(x)
+    x = tf.keras.layers.Dropout(0.25)(x)
 
-    # x = tf.keras.layers.UpSampling1D(5)(x)
-    # x = tf.keras.layers.Conv1D(8, 3, activation='elu', padding='same', 
-    #     kernel_regularizer=tf.keras.regularizers.l1(1e-4))(x)
-    # x = tf.keras.layers.UpSampling1D(2)(x)
-    # x = tf.keras.layers.Conv1D(8, 5, activation='elu', padding='same', 
-    #     kernel_regularizer=tf.keras.regularizers.l1(1e-4))(x)
-    x = tf.keras.layers.Dropout(0.5)(x)
+    x = tf.keras.layers.UpSampling1D(5)(x)
+    x = tf.keras.layers.Conv1D(8, 3, activation='elu', padding='same', 
+        kernel_regularizer=tf.keras.regularizers.l1(1e-4))(x)
+    x = tf.keras.layers.UpSampling1D(2)(x)
+    x = tf.keras.layers.Conv1D(8, 5, activation='elu', padding='same', 
+        kernel_regularizer=tf.keras.regularizers.l1(1e-4))(x)
 
     x = tf.keras.layers.UpSampling1D(2)(x)
     x = tf.keras.layers.Conv1D(8, 5, activation='elu', padding='same', 
@@ -55,6 +55,7 @@ def GetModel(fbg_count):
     decoded = decoder(x)
 
 
+    x = tf.keras.layers.Conv1D(8, 3, activation='elu', padding='same')(x)
     x = tf.keras.layers.Conv1D(8, 3, activation='elu', padding='same')(x)
     x = tf.keras.layers.MaxPooling1D(2)(x)
     x = tf.keras.layers.Flatten()(x)
