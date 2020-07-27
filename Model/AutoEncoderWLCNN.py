@@ -21,7 +21,7 @@ def Decoder():
 
 
     # # x = tf.keras.layers.Conv1D(1, 1, activation='elu', padding='same')(x)
-    x = tf.keras.layers.Dropout(0.25)(x)
+    x = tf.keras.layers.Dropout(0.4)(x)
 
     x = tf.keras.layers.UpSampling1D(5)(x)
     x = tf.keras.layers.Conv1D(8, 3, activation='elu', padding='same', 
@@ -29,6 +29,8 @@ def Decoder():
     x = tf.keras.layers.UpSampling1D(2)(x)
     x = tf.keras.layers.Conv1D(8, 5, activation='elu', padding='same', 
         kernel_regularizer=tf.keras.regularizers.l1(1e-4))(x)
+
+    x = tf.keras.layers.Dropout(0.4)(x)
 
     x = tf.keras.layers.UpSampling1D(2)(x)
     x = tf.keras.layers.Conv1D(8, 5, activation='elu', padding='same', 
@@ -57,8 +59,8 @@ def GetModel(fbg_count):
 
     x = tf.keras.layers.Flatten()(x)
 
-    x = tf.keras.layers.Dense(fbg_count*6, activation='elu')(x)
-    x = tf.keras.layers.Dense(fbg_count*3, activation='elu')(x)
+    x = tf.keras.layers.Dense(fbg_count*10, activation='elu')(x)
+    x = tf.keras.layers.Dense(fbg_count*5, activation='elu')(x)
     wl = tf.keras.layers.Dense(fbg_count)(x)
 
     encdec = tf.keras.Model(spectra_input, decoded)

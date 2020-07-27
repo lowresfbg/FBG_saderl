@@ -42,7 +42,7 @@ plt.show()
 encdec.summary()
 encdec.load_weights('./SavedModel/EncDecModel.hdf5')
 
-encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-4), loss="mse")
+encdec.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
 
 
 def plot(i):

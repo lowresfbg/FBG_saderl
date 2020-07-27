@@ -58,7 +58,7 @@ def test(AE=True):
         # for layer in encdec.layers:
         #     layer.trainable = False
 
-    model.compile(optimizer=tf.keras.optimizers.Adam(lr=2e-3), loss="mse")
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
 
 
     class ML_logger:
@@ -108,7 +108,7 @@ def test(AE=True):
     # print("training cycle", i)
 
     model.fit(train_X, train_Y_wl-1545, epochs=2000, batch_size=10000,
-            validation_split = 0.8,
+            validation_split = 0.9, verbose=1,
             callbacks=[tf.keras.callbacks.LambdaCallback(on_epoch_end=logger.plot_ml)])
     # model.save_weights('./SavedModel/EncDecWLModel.hdf5')
 
@@ -132,24 +132,37 @@ plt.subplot(212)
 plt.yscale('log')
 plt.title('test loss')
 
+
+import csv
+
 for i in range(10):
+    with open('./AETestResults/fitting{:02d}.csv'.format(i), 'w', newline='') as f:
 
-    
-    t = test(True)
-    plt.subplot(211)
-    plt.plot(t[0], c='red', alpha=0.4, label="with AE")
-    plt.subplot(212)
-    plt.plot(t[1], c='red', alpha=0.4, label="with AE")
-    plt.tight_layout()
-    plt.pause(0.01)
+        writer = csv.writer(f)
 
-    t = test(False)
-    plt.subplot(211)
-    plt.plot(t[0], c='blue', alpha=0.4, label="without AE")
-    plt.subplot(212)
-    plt.plot(t[1], c='blue', alpha=0.4, label="without AE")
-    plt.tight_layout()
-    plt.pause(0.01)
+        # red for AE
+        t = test(True)
+        plt.subplot(211)
+        plt.plot(t[0], c='red', alpha=0.4, label="with AE") # 0 for train
+        plt.subplot(212)
+        plt.plot(t[1], c='red', alpha=0.4, label="with AE") # 1 for test
+        plt.tight_layout()
+        plt.pause(0.01)
+
+        writer.writerow(t[0])
+        writer.writerow(t[1])
+
+        # blue for compare
+        t = test(False)
+        plt.subplot(211)
+        plt.plot(t[0], c='blue', alpha=0.4, label="without AE") # 0 for train
+        plt.subplot(212)
+        plt.plot(t[1], c='blue', alpha=0.4, label="without AE") # 1 for test
+        plt.tight_layout()
+        plt.pause(0.01)
+
+        writer.writerow(t[0])
+        writer.writerow(t[1])
 
 
 plt.show()
