@@ -55,11 +55,10 @@ def GetModel(fbg_count):
     decoded = decoder(x)
 
 
-    x = tf.keras.layers.Conv1D(8, 3, activation='elu', padding='same')(x)
-    x = tf.keras.layers.Conv1D(8, 3, activation='elu', padding='same')(x)
-    x = tf.keras.layers.MaxPooling1D(2)(x)
     x = tf.keras.layers.Flatten()(x)
 
+    x = tf.keras.layers.Dense(fbg_count*6, activation='elu')(x)
+    x = tf.keras.layers.Dense(fbg_count*3, activation='elu')(x)
     wl = tf.keras.layers.Dense(fbg_count)(x)
 
     encdec = tf.keras.Model(spectra_input, decoded)
