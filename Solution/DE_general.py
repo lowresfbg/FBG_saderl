@@ -68,7 +68,7 @@ def Evaluate(data, X, I, W, spectra_diff=spectra_diff):
 @tf.function
 def loop(i, full_data, iterations, X, CR, F, max_xn, min_xn, I, W, spectra_diff):
     # print(i)
-    step = tf.maximum(1, tf.cast((1-i/iterations)*100, tf.dtypes.int32))
+    step = tf.maximum(1, tf.cast((1-i/iterations)*3, tf.dtypes.int32))
     data = full_data[:, ::step]
     # data = full_data
 
@@ -76,8 +76,8 @@ def loop(i, full_data, iterations, X, CR, F, max_xn, min_xn, I, W, spectra_diff)
 
     V = (V-min_xn) % (max_xn-min_xn)+min_xn
 
-    dv = Evaluate(data, V, I,  W, spectra_diff)
-    dx = Evaluate(data, X,  I, W, spectra_diff)
+    dv = Evaluate(data, V, I, W, spectra_diff)
+    dx = Evaluate(data, X, I, W, spectra_diff)
 
     X = X + (V-X) * \
         tf.expand_dims(tf.cast(dv < dx, tf.dtypes.float32), 1)
@@ -87,8 +87,8 @@ def loop(i, full_data, iterations, X, CR, F, max_xn, min_xn, I, W, spectra_diff)
 
 @tf.function
 def computeRange(data, I):
-    xs = tf.repeat([data[0][::10]], tf.shape(I)[0], axis=0)
-    ys = tf.repeat([data[1][::10]], tf.shape(I)[0], axis=0)
+    xs = tf.repeat([data[0]], tf.shape(I)[0], axis=0)
+    ys = tf.repeat([data[1]], tf.shape(I)[0], axis=0)
     Is = tf.expand_dims(I, axis=1)*0.001*0.5
 
     mask = tf.cast(ys > Is, tf.dtypes.float32)
