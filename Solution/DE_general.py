@@ -67,8 +67,8 @@ def Evaluate(data, X, I, W, spectra_diff=spectra_diff):
 
 @tf.function
 def loop(i, full_data, iterations, X, CR, F, max_xn, min_xn, I, W, spectra_diff):
-    # print(i)
-    step = tf.maximum(1, tf.cast((1-i/iterations)*3, tf.dtypes.int32))
+    print(i)
+    step = tf.maximum(1, tf.cast((1-i/iterations)*2, tf.dtypes.int32))
     data = full_data[:, ::step]
     # data = full_data
 
@@ -150,8 +150,9 @@ class DE(tf.keras.Model):
                                  self.spectra_diff)
         i = i+1
 
-        max_dist = tf.reduce_max(tf.reduce_max(self.X, axis=0) -
-                                    tf.reduce_min(self.X, axis=0))
+        max_dist = tf.reduce_mean(tf.math.reduce_std(self.X, axis=0))
+
+
         if self.EarlyStop:
             if max_dist < self.EarlyStop_threshold:
                 print('early stopping at i={}'.format(i))

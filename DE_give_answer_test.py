@@ -1,3 +1,7 @@
+
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 import matplotlib.pyplot as plt
 
 from Solution.DE_general import DE, spectra_diff_contrast, spectra_diff_absolute
@@ -26,18 +30,18 @@ cmap = matplotlib.cm.get_cmap('cool')
 print('loading dataset')
 # [:,:,948-76:1269-76]
 
-fbgs = 5
-samples = 100
+fbgs = 10
+samples = 1000
 
 
 
 x_coord = tf.linspace(1545.0, 1549.0, 1000)
 
 X1 = tf.random.uniform([samples, fbgs])*3+1545.5
-I1 = tf.repeat([[1,0.5,0.25,0.125,0.0625]], samples, axis=0)*1e3
+I1 = tf.repeat([[ 1, 0.5, 0.3, 0.2, 0.1 ,0.05,0.03,0.02,0.01,0.005 ]], samples, axis=0)*1e3
 W1 = tf.ones([samples, fbgs]) * 0.2
 spectrums1 = FBG_spectra(x_coord, X1, I1, W1) 
-# spectrums1 = spectrums1 + tf.random.uniform(spectrums1.shape) * 0.1
+spectrums1 = spectrums1 + (tf.random.uniform(spectrums1.shape)-0.5) * 0.001
 
 dataset =tf.concat([ tf.repeat(x_coord[tf.newaxis,tf.newaxis, :], samples, axis=0), tf.expand_dims(spectrums1, axis=1) ] , axis=1)
 
@@ -52,9 +56,9 @@ de = DE()
 
 def InsertAnswer(info, answer):
     i, data, X = info
-    amount = 20
+    amount = 25
     if i<1:
-        de.X = tf.concat([ tf.repeat([answer],amount, axis=0) + (tf.random.uniform([amount, fbgs])-0.5)*0.02 , de.X[amount:]], axis=0)
+        de.X = tf.concat([ tf.repeat([answer],amount, axis=0) + (tf.random.uniform([amount, fbgs])-0.5)*2*0.001 , de.X[amount:]], axis=0)
 
 
 
@@ -71,8 +75,8 @@ def init(de, answer, giveAnswer = False):
     de.I = I
     de.W = W
     de.NP = 50
-    de.CR = 0.9
-    de.F = 0.9
+    de.CR = 0.75
+    de.F = 0.5
     # de.Ranged = True
     de.EarlyStop_threshold = 1e-3
     # de.spectra_diff = spectra_diff_contrast
@@ -114,11 +118,17 @@ iterations_log = []
 output_error_rmse_log = []
 c = []
 
+errorOverIterationsLine = []
 
-for rt in range(100):
+
+for rt in range(10):
     for i in range(spectrums1.shape[0]):
         for j in range(2):
-            input_error = (tf.random.uniform([fbgs])-0.5)*0.02
+            sl = SingleLogger(I, W)
+            sl.Animate = False
+
+
+            input_error = (tf.random.uniform([fbgs])-0.5)*2*0.001
             giveAnswer = j%2==0
 
             input_error_rmse = tf.sqrt(tf.reduce_mean(input_error**2))
@@ -133,6 +143,7 @@ for rt in range(100):
 
             answer = X1[i]
             init(de, answer+input_error, giveAnswer)
+            de.afterEach = [sl.log]
 
             X = de(data, max_iter=ITERATION)
 
@@ -142,16 +153,24 @@ for rt in range(100):
             output_error_rmse = tf.sqrt(tf.reduce_mean((x_mean-answer)**2))
             output_error_rmse_log.append(output_error_rmse)
 
+            errorOverIterationsLine.append(np.sqrt(np.mean((np.array(sl.X_mean_log)-np.array(answer)[np.newaxis, :])**2,axis=1)))
+            
+
             if giveAnswer:
-                c.append(cmap(input_error_rmse*10))
+                c.append(cmap(input_error_rmse*1000))
             else:
-                c.append((0,0,0))
+                c.append((1,.6,.1))
 
             plt.clf()
 
             plt.xscale('log')
-            plt.scatter(np.array(output_error_rmse_log), np.array(iterations_log), c=c, s=2)
-            # plt.yscale('log')
+            plt.yscale('log')
+
+            plt.scatter(np.array(iterations_log),np.array(output_error_rmse_log), c=c, s=4)
+
+            for j,line in enumerate(errorOverIterationsLine):
+                plt.plot(line, c=c[j], alpha=0.1)
+
 
             plt.pause(0.01)
             plt.tight_layout()
