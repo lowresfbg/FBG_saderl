@@ -15,11 +15,20 @@ def normalize(spectra):
 
 
 fbgs = 5
-samples = 1000
+samples = 10000
 
 x_coord = tf.linspace(1545.0, 1549.0, 1000)
 
-X1 = tf.random.uniform([samples, fbgs])*3+1545.5
+
+
+X1 = tf.repeat(tf.concat([
+    tf.linspace(1545.5,1548.5,1000)[:,tf.newaxis],
+    tf.linspace(1545.0,1548.0,1000)[:,tf.newaxis],
+    tf.linspace(1546.0,1548.0,1000)[:,tf.newaxis],
+    tf.linspace(1547.0,1548.0,1000)[:,tf.newaxis],
+    tf.linspace(1548.0,1548.0,1000)[:,tf.newaxis],
+], axis=1),10,axis=0)
+
 I1 = tf.repeat([[ 1, 0.5, 0.3, 0.2, 0.1  ]], samples, axis=0)*1e3
 W1 = tf.ones([samples, fbgs]) * 0.2
 spectrums1 = FBG_spectra(x_coord, X1, I1, W1) 
@@ -58,7 +67,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
 
 def TrainModel(amount):
     print('training', amount, train_X, train_Y_wl)
-    model.fit(train_X[:amount], (train_Y_wl[:amount]-1545.0)/4.0, epochs=500, batch_size=1000, verbose=1)
+    history = model.fit(train_X[:amount], (train_Y_wl[:amount]-1545.0)/4.0, epochs=100, batch_size=1000, verbose=1)
     
 
 
@@ -80,22 +89,22 @@ ITERATION = 2000
 
 de = DE()
 
-def InsertAnswer(info, answer):
+def InsertAnswer(info, answer, radius):
     i, data, X = info
-    amount = 5
+    amount = 50
     if i<1:
-        de.X = tf.concat([ tf.repeat([answer],amount, axis=0) + (tf.random.uniform([amount, fbgs])-0.5)*0.02 , de.X[amount:]], axis=0)
+        de.X = tf.concat([ tf.repeat([answer],amount, axis=0) + (tf.random.uniform([amount, fbgs])-0.5)*radius , de.X[amount:]], axis=0)
 
 
 
-def giveAnswerGenerator(answer):
-    return lambda info : InsertAnswer(info, answer)
+def giveAnswerGenerator(answer, radius):
+    return lambda info : InsertAnswer(info, answer, radius)
 
 
 I = I1[0]
 W = W1[0]
 
-def init(de, answer, giveAnswer = False):
+def init(de, answer,radius, giveAnswer = False):
     de.minx = 1545.0
     de.maxx = 1549.0
     de.I = I
@@ -104,12 +113,12 @@ def init(de, answer, giveAnswer = False):
     de.CR = 0.75
     de.F = 0.5
     # de.Ranged = True
-    de.EarlyStop_threshold = 1e-3
+    de.EarlyStop_threshold = 2e-4
     # de.spectra_diff = spectra_diff_contrast
     de.beforeEach = []
 
     if giveAnswer:
-        de.beforeEach.append(giveAnswerGenerator(answer))
+        de.beforeEach.append(giveAnswerGenerator(answer, radius))
 
 
 
@@ -117,18 +126,18 @@ def init(de, answer, giveAnswer = False):
 errorOverIterationsLine = []
 
 
-def test(data, answer, answerTrue):
+def test(data, answer, answerTrue, radius):
     sl = SingleLogger(I, W)
     sl.Animate = False
 
-    init(de, answer, True)
+    init(de, answer, radius, True)
     de.afterEach = [sl.log]
 
     X = de(data, max_iter=ITERATION)
 
 
     errorOverIterationsLine.append(np.sqrt(np.mean((np.array(sl.X_mean_log)-np.array(answerTrue)[np.newaxis, :])**2,axis=1)))
-    
+    print(errorOverIterationsLine)
 
 
     plt.xscale('log')
@@ -140,8 +149,10 @@ def test(data, answer, answerTrue):
 
     plt.tight_layout()
 
+#TODO: get confidence score from train model result and use it as give answer radius !!!!!!!!!!!!
+confidence = 1
 
-for i in range(0, samples, 100):
+for i in range(0, samples, 1000):
 
     answer = model( spectrums1[i][tf.newaxis,:] )[0]*4+1545
     answerTrue = X1[i]
@@ -154,10 +165,10 @@ for i in range(0, samples, 100):
     ], axis=0)
     plt.clf()
 
-    test(data, answer, answerTrue)
+    test(data, answer, answerTrue, 2e-3)
+
+    confidence = TrainModel((i+1)*1000)
+
     plt.pause(0.01)
-
-    TrainModel((i+1)*100)
-
 
 plt.show()
