@@ -29,6 +29,8 @@ X1 = tf.repeat(tf.concat([
     tf.linspace(1548.0,1548.0,1000)[:,tf.newaxis],
 ], axis=1),10,axis=0)
 
+X1 = tf.random.uniform([samples, fbgs]) *3 +1545.5
+
 I1 = tf.repeat([[ 1, 0.5, 0.3, 0.2, 0.1  ]], samples, axis=0)*1e3
 W1 = tf.ones([samples, fbgs]) * 0.2
 spectrums1 = FBG_spectra(x_coord, X1, I1, W1) 
@@ -67,7 +69,8 @@ model.compile(optimizer=tf.keras.optimizers.Adam(lr=1e-3), loss="mse")
 
 def TrainModel(amount):
     print('training', amount, train_X, train_Y_wl)
-    history = model.fit(train_X[:amount], (train_Y_wl[:amount]-1545.0)/4.0, epochs=100, batch_size=1000, verbose=1)
+    history = model.fit(train_X[:amount], (train_Y_wl[:amount]-1545.0)/4.0, epochs=500, batch_size=1000, verbose=1)
+    return history.history['loss'][-1]
     
 
 
@@ -91,9 +94,9 @@ de = DE()
 
 def InsertAnswer(info, answer, radius):
     i, data, X = info
-    amount = 50
+    amount = 25
     if i<1:
-        de.X = tf.concat([ tf.repeat([answer],amount, axis=0) + (tf.random.uniform([amount, fbgs])-0.5)*radius , de.X[amount:]], axis=0)
+        de.X = tf.concat([ tf.repeat([answer],amount, axis=0) + (tf.random.uniform([amount, fbgs])-0.5)*(radius+ 4e-3) , de.X[amount:]], axis=0)
 
 
 
@@ -112,8 +115,8 @@ def init(de, answer,radius, giveAnswer = False):
     de.NP = 50
     de.CR = 0.75
     de.F = 0.5
-    # de.Ranged = True
-    de.EarlyStop_threshold = 2e-4
+    de.Ranged = True
+    de.EarlyStop_threshold = 1e-3
     # de.spectra_diff = spectra_diff_contrast
     de.beforeEach = []
 
@@ -140,20 +143,25 @@ def test(data, answer, answerTrue, radius):
     print(errorOverIterationsLine)
 
 
-    plt.xscale('log')
+    # plt.xscale('log')
     plt.yscale('log')
 
+    xoffset = 0
     for j,line in enumerate(errorOverIterationsLine):
-        plt.plot(line, alpha=0.5)
+        plt.axvline(xoffset)
+        length = line.shape[0]
+        plt.plot(np.arange(xoffset, xoffset+length),line)
+        xoffset+=length
 
 
     plt.tight_layout()
 
-#TODO: get confidence score from train model result and use it as give answer radius !!!!!!!!!!!!
-confidence = 1
 
-for i in range(0, samples, 1000):
+confidence = 1.0
 
+for i in range(0, samples, 100):
+
+    print('current confidence:', confidence)
     answer = model( spectrums1[i][tf.newaxis,:] )[0]*4+1545
     answerTrue = X1[i]
 
@@ -165,9 +173,9 @@ for i in range(0, samples, 1000):
     ], axis=0)
     plt.clf()
 
-    test(data, answer, answerTrue, 2e-3)
+    test(data, answer, answerTrue, confidence*2)
 
-    confidence = TrainModel((i+1)*1000)
+    confidence = TrainModel((i+1)*100)
 
     plt.pause(0.01)
 
