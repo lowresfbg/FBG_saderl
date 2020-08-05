@@ -10,6 +10,7 @@ def Resample(dataset, fbg_count, skip=1, target=1000, threshold=1.5e-5):
     if type(dataset) is tuple:
         print('is tuple!')
         dataset, answertable = dataset
+        # print(len(dataset), answertable.shape)
         answer = answertable[:, :fbg_count]
         peaks = tf.constant(np.concatenate([
             answertable[0, fbg_count:fbg_count*2, np.newaxis],
@@ -27,6 +28,7 @@ def Resample(dataset, fbg_count, skip=1, target=1000, threshold=1.5e-5):
 
 def Sample(dataset, target, skip=1):
     dataset = tf.constant(dataset, dtype=tf.dtypes.float32)[:, :, ::skip]
+    print(dataset)
     x_coord = np.linspace(np.min(dataset[:, 0]), np.max(dataset[:, 0]), target)
     new_dataset = []
     for i in range(dataset.shape[0]):

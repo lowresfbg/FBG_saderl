@@ -32,6 +32,15 @@ def load_folder(folder):
 
 # load data sets
 
+
+# 10 FBG
+def DATASET_10fbg_1():
+    return load_folder("Measured/10fbg/")
+
+# 7 FBG
+def DATASET_7fbg_1():
+    return load_folder("Measured/7fbg/")
+    
 # 5 FBG
 
 

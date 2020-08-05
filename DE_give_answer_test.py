@@ -1,6 +1,20 @@
+from cycler import cycler
+default_cycler = (cycler(color=[
+    '#3f51b5',
+    '#ff5722',
+    '#4caf50',
+    '#e91e63',
+    '#9c27b0',
+    '#2196f3',
+    '#fbc02d']))
+import matplotlib as mpl
+mpl.rcParams['axes.prop_cycle'] = default_cycler
+
+
+
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 import matplotlib.pyplot as plt
 
@@ -30,12 +44,12 @@ cmap = matplotlib.cm.get_cmap('cool')
 print('loading dataset')
 # [:,:,948-76:1269-76]
 
-samples = 10
-testRepeat = 10
-ITERATION = 5000
+samples = 20
+testRepeat = 5
+ITERATION = 2000
 
 errorOverIterationsLineGroup = []
-fbgsCounts = [3,5,10]
+fbgsCounts = [3,5,7]
 
 
 
@@ -72,26 +86,26 @@ def plot():
             a = average[i,j]
             d = std[i,j]
             ga = j%2==0
-            label = "{}fbgs".format(fbgs)
+            label = "{}FBG".format(fbgs)
             if ga:
-                label+="-Ours"
+                label+="-ours"
             p = plt.plot(a, label=label)
             plt.fill_between(np.arange(ITERATION), a-d, a+d, facecolor=p[0].get_color(), alpha=0.5)
 
 
     plt.legend()
             
-
+plt.figure(figsize=(3.89*2,3.98), dpi=150)
 for fbgs in fbgsCounts:
 
     x_coord = tf.linspace(1545.5, 1548.5, 1000)
 
     X1 = tf.random.uniform([samples, fbgs])*3+1545.5
-    I1 = tf.repeat([[ 1, 0.5, 0.3, 0.2, 0.1 ,0.05,0.03,0.02,0.01,0.005 ][:fbgs]], samples, axis=0)*1e3
-    W1 = tf.ones([samples, fbgs]) * 0.2
+    I1 = tf.repeat([[ 1, 0.5, 0.25, 0.125, 0.0625 ,0.03125,0.015625,0.0078125,0.000390625,0.000001953125 ][:fbgs]], samples, axis=0)*1e3
+    W1 = tf.ones([samples, fbgs]) * 0.15
     
     spectrums1 = FBG_spectra(x_coord, X1, I1, W1) 
-    spectrums1 = spectrums1 + (tf.random.uniform(spectrums1.shape)-0.5) * 0.0001
+    # spectrums1 = spectrums1 + (tf.random.uniform(spectrums1.shape)-0.5) * 0.0001
 
     dataset =tf.concat([ tf.repeat(x_coord[tf.newaxis,tf.newaxis, :], samples, axis=0), tf.expand_dims(spectrums1, axis=1) ] , axis=1)
 
@@ -107,7 +121,7 @@ for fbgs in fbgsCounts:
 
     def InsertAnswer(info, answer):
         i, data, X = info
-        amount = 50
+        amount = fbgs*10
         if i<1:
             de.X = tf.concat([ tf.repeat([answer],amount, axis=0) + (tf.random.uniform([amount, fbgs])-0.5)*2*0.002 , de.X[amount:]], axis=0)
 
@@ -125,11 +139,11 @@ for fbgs in fbgsCounts:
         de.maxx = 1549.0
         de.I = I
         de.W = W
-        de.NP = 100
-        de.CR = 0.9
-        de.F = 0.7
+        de.NP = fbgs*20
+        de.CR = 0.8
+        de.F = 0.5
         de.Ranged = True
-        de.EarlyStop_threshold = 1e-3
+        de.EarlyStop_threshold = 1.5e-3
         # de.spectra_diff = spectra_diff_contrast
         de.beforeEach = []
 
@@ -180,7 +194,7 @@ for fbgs in fbgsCounts:
 
 
                 input_error = (tf.random.uniform([fbgs])-0.5)*2*0.001
-                giveAnswer = j%2==0
+                giveAnswer = j%2==1
 
                 # input_error_rmse = tf.sqrt(tf.reduce_mean(input_error**2))
                 # input_error_rmse_log.append(input_error_rmse)
@@ -228,7 +242,10 @@ for fbgs in fbgsCounts:
 
     errorOverIterationsLineGroup.append(errorOverIterationsLine)
     plt.clf()
+    plt.xlabel("Iterations")
+    plt.ylabel("RMS Error")
     plot()
+    plt.tight_layout()
     plt.pause(0.01)
 
 plt.show()

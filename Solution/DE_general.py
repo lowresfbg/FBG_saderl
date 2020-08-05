@@ -68,9 +68,9 @@ def Evaluate(data, X, I, W, spectra_diff=spectra_diff):
 @tf.function
 def loop(i, full_data, iterations, X, CR, F, max_xn, min_xn, I, W, spectra_diff):
     print(i)
-    step = tf.maximum(1, tf.cast((1-i/iterations)*2, tf.dtypes.int32))
-    data = full_data[:, ::step]
-    # data = full_data
+    # step = tf.maximum(1, tf.cast((1-i/iterations)*2, tf.dtypes.int32))
+    # data = full_data[:, ::step]
+    data = full_data
 
     V = de_alg.Mutate(X, CR, F)
 
