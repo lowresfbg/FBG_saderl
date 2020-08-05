@@ -32,7 +32,7 @@ print('loading dataset')
 
 samples = 10
 testRepeat = 10
-ITERATION = 1000
+ITERATION = 5000
 
 errorOverIterationsLineGroup = []
 fbgsCounts = [3,5,10]
@@ -126,8 +126,8 @@ for fbgs in fbgsCounts:
         de.I = I
         de.W = W
         de.NP = 100
-        de.CR = 0.75
-        de.F = 0.5
+        de.CR = 0.9
+        de.F = 0.7
         de.Ranged = True
         de.EarlyStop_threshold = 1e-3
         # de.spectra_diff = spectra_diff_contrast
