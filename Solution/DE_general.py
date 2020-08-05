@@ -75,6 +75,7 @@ def loop(i, full_data, iterations, X, CR, F, max_xn, min_xn, I, W, spectra_diff)
     V = de_alg.Mutate(X, CR, F)
 
     V = (V-min_xn) % (max_xn-min_xn)+min_xn
+    X = (X-min_xn) % (max_xn-min_xn)+min_xn
 
     dv = Evaluate(data, V, I, W, spectra_diff)
     dx = Evaluate(data, X, I, W, spectra_diff)
