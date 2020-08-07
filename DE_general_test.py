@@ -1,13 +1,33 @@
 import matplotlib.pyplot as plt
+from cycler import cycler
+default_cycler = (cycler(color=[
+    '#3f51b5',
+    '#ff5722',
+    '#4caf50',
+    '#e91e63',
+    '#9c27b0',
+    '#2196f3',
+    '#fbc02d']))
+import matplotlib as mpl
+mpl.rcParams['axes.prop_cycle'] = default_cycler
+
+
+from matplotlib.ticker import MaxNLocator
+
+#...
+
+# ---------------
+
 import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 from Solution.DE_general import DE, spectra_diff_contrast, spectra_diff_absolute
 
 from Dataset.Simulation.GaussCurve_TF import FBG_spectra, GaussCurve
 
 # DATASET!!!!!!!!!!!!!
-from Dataset.loader import DATASET_7fbg_1 as Dataset
+from Dataset.loader import DATASET_3fbg_1_2 as Dataset
+# from Dataset.loader import DATASET_7fbg_1 as Dataset
 from Dataset.loader import DATASET_background
 from Dataset import Resampler
 
@@ -23,8 +43,9 @@ from AutoFitAnswer import Get3FBGAnswer
 print('loading dataset')
 # [:,:,948-76:1269-76]
 
-dataset = Dataset()[0]
-fbgs=7
+# dataset = Dataset()[0]
+dataset = Dataset()
+fbgs=3
 
 
 
@@ -35,7 +56,7 @@ newDataset = []
 for data in dataset:
     newDataset.append(np.array([
             data[0],
-            data[1] #/ background
+            data[1] / background
         ]))
 
 ymax = np.max(newDataset[0][1])
@@ -43,7 +64,8 @@ ymin = np.min(newDataset[0][1])
 threshold = (ymax-ymin)*0.1+ymin
 
 
-dataset, answer, peaks = Resampler.Resample((newDataset, Dataset()[1]), fbgs, 1, 1000, threshold)
+# dataset, answer, peaks = Resampler.Resample((newDataset, Dataset()[1]), fbgs, 1, 1000, threshold)
+dataset, answer, peaks = Resampler.Resample(newDataset, fbgs, 1, 1000, threshold)
 
 print(dataset.shape)
 
@@ -56,7 +78,7 @@ W = peaks[:, 0] #*0.9
 
 
 print('loading completed')
-ITERATION = 5000
+ITERATION = 3000
 
 de = DE()
 
@@ -105,14 +127,17 @@ def evaluateData(data):
 
     plt.plot(answer,"--" ,color='gray')
     for i in range(X_log[0].shape[0]):
-        plt.plot(np.array(X_log)[:,i], "o-", label="FBG{}".format(i+1))
+        plt.plot(np.array(X_log)[:,i], "o", label="FBG{}".format(i+1))
     
 
     # plt.twinx()
     # plt.plot(err_log)
-    plt.legend()
-    plt.xlabel("Test set")
-    plt.ylabel("Wavelength")
+    plt.legend(fontsize=6)
+    # plt.legend(fontsize=6, ncol=2)
+    plt.xlabel("Tests\n"+ r"$\bf{(b)}$")
+    plt.ylabel("Wavelength (nm)")
+    plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
+
     plt.tight_layout()
     plt.pause(0.01)
     return X
