@@ -1,6 +1,20 @@
+from cycler import cycler
+default_cycler = (cycler(color=[
+    '#3f51b5',
+    '#ff5722',
+    '#4caf50',
+    '#e91e63',
+    '#9c27b0',
+    '#2196f3',
+    '#fbc02d']))
+import matplotlib as mpl
+mpl.rcParams['axes.prop_cycle'] = default_cycler
+
+# ---------------
+
 import matplotlib.pyplot as plt
 import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 from Solution.DE_general import DE, spectra_diff_contrast, spectra_diff_absolute
 
@@ -24,6 +38,7 @@ print('loading dataset')
 # [:,:,948-76:1269-76]
 
 dataset = Dataset()[0]
+# dataset = Dataset()
 fbgs=7
 
 
@@ -44,6 +59,7 @@ threshold = (ymax-ymin)*0.1+ymin
 
 
 dataset, answer, peaks = Resampler.Resample((newDataset, Dataset()[1]), fbgs, 1, 1000, threshold)
+# dataset, answer, peaks = Resampler.Resample(newDataset, fbgs, 1, 1000, threshold)
 
 print(dataset.shape)
 
@@ -56,7 +72,7 @@ W = peaks[:, 0] #*0.9
 
 
 print('loading completed')
-ITERATION = 5000
+ITERATION = 3000
 
 de = DE()
 
@@ -105,14 +121,14 @@ def evaluateData(data):
 
     plt.plot(answer,"--" ,color='gray')
     for i in range(X_log[0].shape[0]):
-        plt.plot(np.array(X_log)[:,i], "o-", label="FBG{}".format(i+1))
+        plt.plot(np.array(X_log)[:,i], "o", label="FBG{}".format(i+1))
     
 
     # plt.twinx()
     # plt.plot(err_log)
-    plt.legend()
-    plt.xlabel("Test set")
-    plt.ylabel("Wavelength")
+    plt.legend(fontsize=6, ncol=2)
+    plt.xlabel("Tests\n"+ r"$\bf{(d)}$")
+    plt.ylabel("Wavelength (nm)")
     plt.tight_layout()
     plt.pause(0.01)
     return X
