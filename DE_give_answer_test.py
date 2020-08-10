@@ -47,7 +47,7 @@ print('loading dataset')
 
 samples = 20
 testRepeat = 5
-ITERATION = 2000
+ITERATION = 3000
 
 errorOverIterationsLineGroup = []
 fbgsCounts = [3,5,7]
@@ -93,6 +93,7 @@ def plot():
 
     std /= n_of_line
     std = np.sqrt(std)
+    print(std)
 
     plt.xscale('log')
     plt.yscale('log')
@@ -114,6 +115,7 @@ def plot():
 plotAll()
 
 def calculate():
+    global errorOverIterationsLineGroup
     errorOverIterationsLineGroup = []
     for fbgs in fbgsCounts:
 
@@ -159,8 +161,8 @@ def calculate():
             de.I = I
             de.W = W
             de.NP = fbgs*40
-            de.CR = 0.6
-            de.F = 0.6
+            de.CR = 0.8
+            de.F = 0.5
             de.Ranged = True
             de.EarlyStop_threshold = 1.5e-3
             # de.spectra_diff = spectra_diff_contrast
@@ -260,9 +262,11 @@ def calculate():
                     # plt.tight_layout()
 
         errorOverIterationsLineGroup.append(errorOverIterationsLine)
+        print(errorOverIterationsLineGroup)
 
         plotAll()
         plt.pause(0.01)
+    print('done')
 
 calculate()
 plt.show()
