@@ -116,7 +116,6 @@ def test(AE=True):
     # pred_Y_wl = model(train_X)+1545
     # print(pred_Y.shape, train_Y.shape)
 
-
     # for i in range(samples):
     #     plt.plot(x_coord, pred_Y[i], "o")
     #     plt.plot(x_coord, train_Y[i], "-")
@@ -130,13 +129,14 @@ plt.figure(figsize=(3.89*2,3.98), dpi=150)
 
 plt.subplot(211)
 plt.yscale('log')
-plt.xlabel("Iterations\n"+ r"$\bf{(b)}$")
+plt.xlabel("Epochs\n"+ r"$\bf{(b)}$")
 plt.ylabel("RMSE (nm)")
+plt.grid(linestyle=":")
 plt.subplot(212)
 plt.yscale('log')
-plt.xlabel("Iterations\n"+ r"$\bf{(c)}$")
+plt.xlabel("Epochs\n"+ r"$\bf{(c)}$")
 plt.ylabel("RMSE (nm)")
-
+plt.grid(linestyle=":")
 
 calculate = False
 
