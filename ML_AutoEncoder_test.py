@@ -132,6 +132,7 @@ plt.yscale('log')
 plt.xlabel("Epochs\n"+ r"$\bf{(b)}$")
 plt.ylabel("RMSE (nm)")
 plt.grid(linestyle=":")
+
 plt.subplot(212)
 plt.yscale('log')
 plt.xlabel("Epochs\n"+ r"$\bf{(c)}$")
@@ -161,10 +162,16 @@ for i in range(10):
         else:
             t = data[:2]
 
+        label = "with AE"
+        if i!=0:
+            label = None
+
         plt.subplot(211)
-        plt.plot(t[0], c='#ff5722', alpha=0.4, label="with AE") # 0 for train
+        plt.plot(t[0], c='#ff5722', alpha=0.4, label=label) # 0 for train
+        plt.legend()
+        
         plt.subplot(212)
-        plt.plot(t[1], c='#ff5722', alpha=0.4, label="with AE") # 1 for test
+        plt.plot(t[1], c='#ff5722', alpha=0.4) # 1 for test
         plt.tight_layout()
         plt.pause(0.01)
 
@@ -176,16 +183,20 @@ for i in range(10):
             t = test(False)
         else:
             t = data[2:]
-            
+        
+        label="without AE"
+        if i!=0:
+            label = None
         plt.subplot(211)
-        plt.plot(t[0], c='#2196f3', alpha=0.4, label="without AE") # 0 for train
+        plt.plot(t[0], c='#2196f3', alpha=0.4, label=label) # 0 for train
+        plt.legend()
+
         plt.subplot(212)
-        plt.plot(t[1], c='#2196f3', alpha=0.4, label="without AE") # 1 for test
+        plt.plot(t[1], c='#2196f3', alpha=0.4) # 1 for test
         plt.tight_layout()
         plt.pause(0.01)
 
         writer.writerow(t[0])
         writer.writerow(t[1])
-
 
 plt.show()
