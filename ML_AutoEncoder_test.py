@@ -116,7 +116,6 @@ def test(AE=True):
     # pred_Y_wl = model(train_X)+1545
     # print(pred_Y.shape, train_Y.shape)
 
-
     # for i in range(samples):
     #     plt.plot(x_coord, pred_Y[i], "o")
     #     plt.plot(x_coord, train_Y[i], "-")
@@ -125,27 +124,54 @@ def test(AE=True):
     #     plt.show()
     return logger.loss_log, logger.val_loss_log
 
+plt.figure(figsize=(3.89*2,3.98), dpi=150)
+
+
 plt.subplot(211)
 plt.yscale('log')
-plt.title('train loss')
+plt.xlabel("Epochs\n"+ r"$\bf{(b)}$")
+plt.ylabel("RMSE (nm)")
+plt.grid(linestyle=":")
+
 plt.subplot(212)
 plt.yscale('log')
-plt.title('test loss')
+plt.xlabel("Epochs\n"+ r"$\bf{(c)}$")
+plt.ylabel("RMSE (nm)")
+plt.grid(linestyle=":")
 
+calculate = False
 
 import csv
 
+
+
+
 for i in range(10):
+    with open('./AETestResults/fitting{:02d}.csv'.format(i), 'r') as f:
+        data = [np.array(line).astype(float) for line in list(csv.reader(f))]
+
+    print(data)
+
     with open('./AETestResults/fitting{:02d}.csv'.format(i), 'w', newline='') as f:
 
         writer = csv.writer(f)
 
         # red for AE
-        t = test(True)
+        if calculate:
+            t = test(True)
+        else:
+            t = data[:2]
+
+        label = "with AE"
+        if i!=0:
+            label = None
+
         plt.subplot(211)
-        plt.plot(t[0], c='red', alpha=0.4, label="with AE") # 0 for train
+        plt.plot(t[0], c='#ff5722', alpha=0.4, label=label) # 0 for train
+        plt.legend()
+        
         plt.subplot(212)
-        plt.plot(t[1], c='red', alpha=0.4, label="with AE") # 1 for test
+        plt.plot(t[1], c='#ff5722', alpha=0.4) # 1 for test
         plt.tight_layout()
         plt.pause(0.01)
 
@@ -153,16 +179,24 @@ for i in range(10):
         writer.writerow(t[1])
 
         # blue for compare
-        t = test(False)
+        if calculate:
+            t = test(False)
+        else:
+            t = data[2:]
+        
+        label="without AE"
+        if i!=0:
+            label = None
         plt.subplot(211)
-        plt.plot(t[0], c='blue', alpha=0.4, label="without AE") # 0 for train
+        plt.plot(t[0], c='#2196f3', alpha=0.4, label=label) # 0 for train
+        plt.legend()
+
         plt.subplot(212)
-        plt.plot(t[1], c='blue', alpha=0.4, label="without AE") # 1 for test
+        plt.plot(t[1], c='#2196f3', alpha=0.4) # 1 for test
         plt.tight_layout()
         plt.pause(0.01)
 
         writer.writerow(t[0])
         writer.writerow(t[1])
-
 
 plt.show()
