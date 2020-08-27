@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="center"></div>
+    <script>
+        // create web audio api context
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // create Oscillator node
+        var oscillator = audioCtx.createOscillator();
+
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hertz
+        oscillator.connect(audioCtx.destination);
+
+        center_el = document.getElementById('center')
+
+        let f = 0
+
+        function getUpdate(center) {
+            center_el.textContent = center
+            f = center - 1545
+        }
+        function update() {
+            let xhr = new XMLHttpRequest()
+            xhr.open("get", "http://10.123.2.115:1234/")
+            xhr.onload = function () {
+                getUpdate(+xhr.response)
+                requestAnimationFrame(update)
+            }
+            xhr.send()
+        }
+        update()
+
+        addEventListener('click', function () {
+
+
+            oscillator.start();
+        })
+        let sf = 0
+
+        function audioUpdate(){
+            sf+=(f-sf)*0.1
+            oscillator.frequency.setValueAtTime(220*(2**(sf*5)), audioCtx.currentTime);
+            requestAnimationFrame(audioUpdate)
+        }
+        audioUpdate()
+    </script>
+</body>
+
+</html>
