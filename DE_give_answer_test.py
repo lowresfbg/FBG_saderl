@@ -98,8 +98,8 @@ def plot():
     plt.xscale('log')
     plt.yscale('log')
 
-    for (i,fbgs) in enumerate(fbgsCounts):
-        for j in range(2):
+    for j in range(2):
+        for (i,fbgs) in enumerate(fbgsCounts):
             a = average[i,j]
             d = std[i,j]
             ga = j%2==1
@@ -110,7 +110,7 @@ def plot():
             plt.fill_between(np.arange(ITERATION), a-d, a+d, facecolor=p[0].get_color(), alpha=0.5)
 
 
-    plt.legend(fontsize=6, ncol=3)
+    plt.legend(fontsize=6, ncol=2)
             
 plotAll()
 
@@ -160,11 +160,11 @@ def calculate():
             de.maxx = 1549.0
             de.I = I
             de.W = W
-            de.NP = fbgs*40
-            de.CR = 0.8
-            de.F = 0.5
+            de.NP = 200
+            de.CR = 0.99
+            de.F = 1
             de.Ranged = True
-            de.EarlyStop_threshold = 1.5e-3
+            de.EarlyStop_threshold = 2e-3
             # de.spectra_diff = spectra_diff_contrast
             de.beforeEach = []
 
