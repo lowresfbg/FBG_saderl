@@ -110,7 +110,7 @@ def plot():
             plt.fill_between(np.arange(ITERATION), a-d, a+d, facecolor=p[0].get_color(), alpha=0.5)
 
 
-    plt.legend(fontsize=6, ncol=2)
+    plt.legend(fontsize=6, ncol=2, loc='lower left')
             
 plotAll()
 
@@ -160,11 +160,11 @@ def calculate():
             de.maxx = 1549.0
             de.I = I
             de.W = W
-            de.NP = 200
-            de.CR = 0.99
-            de.F = 1
+            de.NP = fbgs*20
+            de.CR = 0.9
+            de.F = 0.8
             de.Ranged = True
-            de.EarlyStop_threshold = 2e-3
+            de.EarlyStop_threshold = 5e-3
             # de.spectra_diff = spectra_diff_contrast
             de.beforeEach = []
 
@@ -268,7 +268,7 @@ def calculate():
         plt.pause(0.01)
     print('done')
 
-calculate()
+# calculate()
 plt.show()
 
 
