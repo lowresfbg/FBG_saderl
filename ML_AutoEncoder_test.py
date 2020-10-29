@@ -127,19 +127,19 @@ def test(AE=True):
 plt.figure(figsize=(3.89*2,3.98), dpi=150)
 
 
-plt.subplot(211)
+# plt.subplot(211)
+# plt.yscale('log')
+# plt.xlabel("Epochs\n"+ r"$\bf{(b)}$")
+# plt.ylabel("RMSE (nm)")
+# plt.grid(linestyle=":")
+
+plt.subplot(111)
 plt.yscale('log')
 plt.xlabel("Epochs\n"+ r"$\bf{(b)}$")
 plt.ylabel("RMSE (nm)")
 plt.grid(linestyle=":")
 
-plt.subplot(212)
-plt.yscale('log')
-plt.xlabel("Epochs\n"+ r"$\bf{(c)}$")
-plt.ylabel("RMSE (nm)")
-plt.grid(linestyle=":")
-
-calculate = False
+calculate = False # super important line ----------------------------------------------------------------------
 
 import csv
 
@@ -166,11 +166,11 @@ for i in range(10):
         if i!=0:
             label = None
 
-        plt.subplot(211)
-        plt.plot(t[0], c='#ff5722', alpha=0.4, label=label) # 0 for train
-        plt.legend(fontsize=6)
+        # plt.subplot(211)
+        # plt.plot(t[0], c='#ff5722', alpha=0.4, label=label) # 0 for train
+        # plt.legend(fontsize=6)
         
-        plt.subplot(212)
+        plt.subplot(111)
         plt.plot(t[1], c='#ff5722', alpha=0.4, label=label) # 1 for test
         plt.legend(fontsize=6)
         
@@ -189,10 +189,10 @@ for i in range(10):
         label="without AE"
         if i!=0:
             label = None
-        plt.subplot(211)
-        plt.plot(t[0], c='#2196f3', alpha=0.4, label=label) # 0 for train
+        # plt.subplot(211)
+        # plt.plot(t[0], c='#2196f3', alpha=0.4, label=label) # 0 for train
 
-        plt.subplot(212)
+        plt.subplot(111)
         plt.plot(t[1], c='#2196f3', alpha=0.4, label=label) # 1 for test
 
         plt.tight_layout()

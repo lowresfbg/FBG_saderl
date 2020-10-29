@@ -105,7 +105,9 @@ def plot():
             ga = j%2==1
             label = "{}FBG".format(fbgs)
             if ga:
-                label+="-ours"
+                label+="-AECNNDE"
+            else:
+                label+="-DE"
             p = plt.plot(a, label=label)
             plt.fill_between(np.arange(ITERATION), a-d, a+d, facecolor=p[0].get_color(), alpha=0.5)
 

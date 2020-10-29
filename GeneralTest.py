@@ -34,10 +34,10 @@ def F_test():
         data = tester.GetData()
 
         # print(data)
-        with open("./TestResult/FWHM_mul/{}.json".format(name), 'w') as f:
-            json.dump(data, f)
+        # with open("./TestResult/FWHM_mul/{}.json".format(name), 'w') as f:
+        #     json.dump(data, f)
 
-# F_test()
+F_test()
 
 
 def plot_result():

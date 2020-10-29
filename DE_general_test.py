@@ -78,7 +78,7 @@ W = peaks[:, 0] #*0.9
 
 
 print('loading completed')
-ITERATION = 3000
+ITERATION = 5000
 
 de = DE()
 
@@ -125,9 +125,9 @@ def evaluateData(data):
 
     plt.clf()
 
-    plt.plot(answer,"--" ,color='gray')
+    # plt.plot(answer,"--" ,color='gray')
     for i in range(X_log[0].shape[0]):
-        plt.plot(np.array(X_log)[:,i], "o", label="FBG{}".format(i+1))
+        plt.plot(np.array(X_log)[:,i], "o", label="FBG{}".format(i+1), markersize=6)
     
 
     # plt.twinx()
