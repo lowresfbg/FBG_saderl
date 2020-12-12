@@ -1,3 +1,16 @@
+from AutoFitAnswer import Get3FBGAnswer
+import numpy as np
+import tensorflow as tf
+from Tests.GeneralTest_logger import SingleLogger
+from Algorithms.PeakFinder import FindPeaks
+from Dataset import Resampler
+from Dataset.loader import DATASET_background
+from Dataset.loader import DATASET_3fbg_2 as Dataset
+from Dataset.Simulation.GaussCurve_TF import FBG_spectra, GaussCurve
+from Solution.DE_general import DE, spectra_diff_contrast, spectra_diff_absolute
+import os
+from matplotlib.ticker import MaxNLocator
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from cycler import cycler
 default_cycler = (cycler(color=[
@@ -8,36 +21,19 @@ default_cycler = (cycler(color=[
     '#9c27b0',
     '#2196f3',
     '#fbc02d']))
-import matplotlib as mpl
 mpl.rcParams['axes.prop_cycle'] = default_cycler
 
 
-from matplotlib.ticker import MaxNLocator
-
-#...
+# ...
 
 # ---------------
 
-import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-from Solution.DE_general import DE, spectra_diff_contrast, spectra_diff_absolute
-
-from Dataset.Simulation.GaussCurve_TF import FBG_spectra, GaussCurve
 
 # DATASET!!!!!!!!!!!!!
-from Dataset.loader import DATASET_3fbg_1_2 as Dataset
+# from Dataset.loader import DATASET_3fbg_1_2 as Dataset
 # from Dataset.loader import DATASET_7fbg_1 as Dataset
-from Dataset.loader import DATASET_background
-from Dataset import Resampler
-
-from Algorithms.PeakFinder import FindPeaks
-
-from Tests.GeneralTest_logger import SingleLogger
-import tensorflow as tf
-
-import numpy as np
-from AutoFitAnswer import Get3FBGAnswer
 
 
 print('loading dataset')
@@ -45,27 +41,34 @@ print('loading dataset')
 
 # dataset = Dataset()[0]
 dataset = Dataset()
-fbgs=3
+fbgs = 3
 
-
+threshold = 1e-5
 
 # HERE IS THE MAGIC...
-
-background = Resampler.Sample(DATASET_background(), len(dataset[0][0]),50)[0][1]
 newDataset = []
-for data in dataset:
-    newDataset.append(np.array([
+Do_the_magic = False
+if Do_the_magic:
+    background = Resampler.Sample(
+        DATASET_background(), len(dataset[0][0]), 50)[0][1]
+    for data in dataset:
+        newDataset.append(np.array([
             data[0],
             data[1] / background
         ]))
 
-ymax = np.max(newDataset[0][1])
-ymin = np.min(newDataset[0][1])
-threshold = (ymax-ymin)*0.1+ymin
+    ymax = np.max(newDataset[0][1])
+    ymin = np.min(newDataset[0][1])
+    threshold = (ymax-ymin)*0.1+ymin
 
 
 # dataset, answer, peaks = Resampler.Resample((newDataset, Dataset()[1]), fbgs, 1, 1000, threshold)
-dataset, answer, peaks = Resampler.Resample(newDataset, fbgs, 1, 1000, threshold)
+# dataset, answer, peaks = Resampler.Resample(
+#     newDataset, fbgs, 1, 1000, threshold)
+
+dataset, answer, peaks = Resampler.Resample(
+    dataset, fbgs, 1, 1000, threshold)
+
 
 print(dataset.shape)
 
@@ -73,8 +76,8 @@ print(dataset.shape)
 print(peaks)
 
 
-I = peaks[:, 2] *1e3
-W = peaks[:, 0] #*0.9
+I = peaks[:, 2] * 1e3
+W = peaks[:, 0]  # *0.9
 
 
 print('loading completed')
@@ -115,7 +118,8 @@ err_log = []
 
 de.afterEach.clear()
 
-plt.figure(figsize=(3.89,3.98),dpi=150)
+plt.figure(figsize=(3.89, 3.98), dpi=150)
+
 
 def evaluateData(data):
     print('run ------------------')
@@ -127,21 +131,20 @@ def evaluateData(data):
 
     # plt.plot(answer,"--" ,color='gray')
     for i in range(X_log[0].shape[0]):
-        plt.plot(np.array(X_log)[:,i], "o", label="FBG{}".format(i+1), markersize=6)
-    
+        plt.plot(np.array(X_log)[:, i], "o",
+                 label="FBG{}".format(i+1), markersize=6)
 
     # plt.twinx()
     # plt.plot(err_log)
     plt.legend(fontsize=6)
     # plt.legend(fontsize=6, ncol=2)
-    plt.xlabel("Tests\n"+ r"$\bf{(b)}$")
+    plt.xlabel("Tests\n" + r"$\bf{(b)}$")
     plt.ylabel("Wavelength (nm)")
     plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
     plt.tight_layout()
     plt.pause(0.01)
     return X
-
 
 
 print("start multiple")
